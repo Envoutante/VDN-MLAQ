@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tutorial Demo</title>
+  </head>
+  <body>
+    <div id="mountNode"></div>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.7.1/dist/g6.min.js"></script>
+    <!-- 4.x and later versions -->
+    <!-- <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script> -->
+    <script>
+      const graph = new G6.Graph({
+        container: 'mountNode',
+        width: 1600,
+        height: 3200,
+        defaultNode: {
+          labelCfg: {
+            style: {
+              fill: '#fff',
+            },
+          },
+        },
+        defaultEdge: {
+          labelCfg: {
+            autoRotate: true,
+          },
+        },
+        nodeStateStyles: {
+          hover: {
+            fill: 'lightsteelblue',
+          },
+          click: {
+            stroke: '#000',
+            lineWidth: 3,
+          },
+        },
+        edgeStateStyles: {
+          click: {
+            stroke: 'steelblue',
+          },
+        },
+        layout: {
+          type: 'force',
+          linkDistance: 100,
+          preventOverlap: true,
+          nodeStrength: -30,
+          edgeStrength: 0.1,
+        },
+        modes: {
+          default: ['drag-canvas', 'zoom-canvas', 'drag-node'],
+        },
+      });
+
+      const main = async () => {
+        const remoteData = {
+    "nodes": [
+    {"id": "0", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel5\nyellow_trapezoid is on panel3\n", "class": "state"},
+    {"id": "1", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel4\nyellow_trapezoid is on panel3\n", "class": "state"},
+    {"id": "2", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel4\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "3", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel4\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "4", "label": "[State]\n[Cube States]\nblue_square is on panel7\npink_polygon is on panel4\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "5", "label": "[State]\n[Cube States]\nblue_square is on panel5\npink_polygon is on panel4\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "6", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel4\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "7", "label": "[State]\n[Cube States]\nblue_square is on panel2  \npink_polygon is on panel4  \nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "8", "label": "[State]\n[Cube States]\nblue_square is on panel7\npink_polygon is on panel3\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "9", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel2\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "10", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel2\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "11", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel3\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "12", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel6\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "13", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel6\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "14", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel5\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "15", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel7\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "16", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel7\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "17", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel5\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "18", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel4\nyellow_trapezoid is on panel1\n", "class": "state"},
+    {"id": "19", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel2\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "20", "label": "[State]\n[Cube States]\nblue_square is on panel4\npink_polygon is on panel6\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "21", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel7\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "22", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel5\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "23", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel4\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "24", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel6\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "25", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel4\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "26", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel4\nyellow_trapezoid is on panel2\n", "class": "state"},
+    {"id": "27", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel4\nyellow_trapezoid is on panel3\n", "class": "state"},
+    {"id": "28", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel2\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "29", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel1\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "30", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel1\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "31", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel3\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "32", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel1\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "33", "label": "[State]\n[Cube States]\nblue_square is on panel7\npink_polygon is on panel5\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "34", "label": "[State]\n[Cube States]\nblue_square is on panel5\npink_polygon is on panel3\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "35", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel4\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "36", "label": "[State]\n[Cube States]\nblue_square is on panel7  \npink_polygon is on panel4  \nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "37", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel4\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "38", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel3\nyellow_trapezoid is on panel2\n", "class": "state"},
+    {"id": "39", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel4\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "40", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel5\nyellow_trapezoid is on panel2\n", "class": "state"},
+    {"id": "41", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel4\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "42", "label": "[State]\n[Cube States]\nblue_square is on panel4\npink_polygon is on panel7\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "43", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel7\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "44", "label": "[State]\n[Cube States]\nblue_square is on panel5\npink_polygon is on panel3\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "45", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel7\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "46", "label": "[State]\n[Cube States]\nblue_square is on panel4\npink_polygon is on panel3\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "47", "label": "[State]\n[Cube States]\nblue_square is on panel4\npink_polygon is on panel5\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "48", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel5\nyellow_trapezoid is on panel6\n", "class": "state"},
+    {"id": "49", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel5\nyellow_trapezoid is on panel1\n", "class": "state"},
+    {"id": "50", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel5\nyellow_trapezoid is on panel4\n", "class": "state"},
+    {"id": "51", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel3\nyellow_trapezoid is on panel4\n", "class": "state"},
+    {"id": "52", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel3\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "53", "label": "[State]\n[Cube States]\nblue_square is on panel6\npink_polygon is on panel5\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "54", "label": "[State]\n[Cube States]\nblue_square is on panel6\npink_polygon is on panel4\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "55", "label": "[State]\n[Cube States]\nblue_square is on panel5\npink_polygon is on panel4\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "56", "label": "[State]\n[Cube States]\nblue_square is on panel6\npink_polygon is on panel3\nyellow_trapezoid is on panel7\n", "class": "state"},
+    {"id": "57", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel5\nyellow_trapezoid is on panel4\n", "class": "state"},
+    {"id": "58", "label": "[State]\n[Cube States]\nblue_square is on panel2\npink_polygon is on panel5\nyellow_trapezoid is on panel4\n", "class": "state"},
+    {"id": "59", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel3\nyellow_trapezoid is on panel4\n", "class": "state"},
+    {"id": "60", "label": "[State]\n[Cube States]\nblue_square is on panel3\npink_polygon is on panel2\nyellow_trapezoid is on panel4\n", "class": "state"},
+    {"id": "61", "label": "[State]\n[Cube States]\nblue_square is on panel1\npink_polygon is on panel2\nyellow_trapezoid is on panel5\n", "class": "state"},
+    {"id": "62", "label": "[State]\n[Cube States]\nblue_square is on panel4\npink_polygon is on panel3\nyellow_trapezoid is on panel6\n", "class": "state"},
+    ],
+    "edges": [
+    {"source": "0", "target": "1", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "0", "target": "27", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "0", "target": "26", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "0", "target": "27", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "1", "target": "2", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "1", "target": "39", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "1", "target": "27", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "2", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION WAIT  \nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "2", "target": "23", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "2", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2  \nNAME Bob ACTION WAIT  \nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6  \n", "weight": 1.0},
+    {"source": "2", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "4", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "4", "target": "34", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PINK pink_polygon PLACE panel3\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "4", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "5", "target": "6", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "5", "target": "35", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel7\n", "weight": 1.0},
+    {"source": "5", "target": "6", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "5", "target": "41", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel5\n", "weight": 1.0},
+    {"source": "6", "target": "7", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "6", "target": "25", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel7\n", "weight": 1.0},
+    {"source": "6", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "6", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "7", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "7", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "7", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "7", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "8", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "8", "target": "36", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "9", "target": "10", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "10", "target": "11", "label": "EXECUTE\nNAME Alice ACTION PICK pink_polygon PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "11", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "12", "target": "13", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel7\n", "weight": 1.0},
+    {"source": "13", "target": "14", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK pink_polygon PLACE panel5\n", "weight": 1.0},
+    {"source": "14", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "14", "target": "25", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "15", "target": "16", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "16", "target": "17", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK pink_polygon PLACE panel5\n", "weight": 1.0},
+    {"source": "16", "target": "22", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK pink_polygon PLACE panel5\n", "weight": 1.0},
+    {"source": "17", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "17", "target": "23", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "17", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "17", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "18", "target": "1", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "19", "target": "10", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "20", "target": "21", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK pink_polygon PLACE panel7\n", "weight": 1.0},
+    {"source": "20", "target": "24", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel7\n", "weight": 1.0},
+    {"source": "21", "target": "16", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "22", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "22", "target": "17", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "23", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "23", "target": "17", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "23", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "23", "target": "2", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel5\n", "weight": 1.0},
+    {"source": "23", "target": "25", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel7\n", "weight": 1.0},
+    {"source": "23", "target": "23", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "23", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2  \nNAME Bob ACTION PICK pink_polygon PLACE panel4  \nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "23", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "24", "target": "14", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK pink_polygon PLACE panel5\n", "weight": 1.0},
+    {"source": "25", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "25", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "25", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "25", "target": "37", "label": "EXECUTE\nIf we agree, I'll do: NAME Alice ACTION PICK blue_square PLACE panel1.\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "25", "target": "2", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel5\n", "weight": 1.0},
+    {"source": "25", "target": "23", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "25", "target": "17", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel5\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "25", "target": "6", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "26", "target": "27", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "26", "target": "27", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "26", "target": "0", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION PICK pink_polygon PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "27", "target": "2", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "27", "target": "1", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "27", "target": "39", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5  \nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "27", "target": "41", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel3\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "28", "target": "10", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "29", "target": "30", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "30", "target": "31", "label": "EXECUTE\nNAME Alice ACTION PICK pink_polygon PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "31", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "32", "target": "30", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2  \nNAME Bob ACTION WAIT  \nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "33", "target": "4", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "33", "target": "8", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION PINK pink_polygon PLACE panel3  \nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "34", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "34", "target": "4", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK blue_square PLACE panel7\n", "weight": 1.0},
+    {"source": "34", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "34", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION PICK pink_polygon PLACE panel4  \nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "34", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "35", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "35", "target": "25", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "36", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION WAIT  \nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "36", "target": "34", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel3\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "37", "target": "23", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "38", "target": "26", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "38", "target": "40", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PINK pink_polygon PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "39", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "39", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "39", "target": "2", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "39", "target": "23", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "40", "target": "27", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "40", "target": "0", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "41", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "41", "target": "2", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2  \nNAME Bob ACTION WAIT  \nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "42", "target": "43", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "43", "target": "17", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK pink_polygon PLACE panel5\n", "weight": 1.0},
+    {"source": "44", "target": "5", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "45", "target": "16", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "46", "target": "47", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel5\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "47", "target": "48", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION PICK blue_square PLACE panel3  \nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "48", "target": "3", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "48", "target": "6", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "49", "target": "1", "label": "EXECUTE\nNAME Alice ACTION PICK yellow_trapezoid PLACE panel3\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "50", "target": "51", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK pink_polygon PLACE panel3\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "51", "target": "52", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "51", "target": "52", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "52", "target": "3", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "52", "target": "2", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "53", "target": "54", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "53", "target": "56", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PINK pink_polygon PLACE panel3\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "54", "target": "55", "label": "EXECUTE\nNAME Alice ACTION WAIT  \nNAME Bob ACTION WAIT  \nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "54", "target": "44", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel3\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "55", "target": "6", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "55", "target": "35", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel3\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "56", "target": "55", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "56", "target": "54", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel4\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "56", "target": "44", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK blue_square PLACE panel5\n", "weight": 1.0},
+    {"source": "57", "target": "58", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION WAIT\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "57", "target": "59", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION PICK pink_polygon PLACE panel3\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "58", "target": "51", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel3\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "59", "target": "52", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel2\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "60", "target": "61", "label": "EXECUTE\nNAME Alice ACTION PICK blue_square PLACE panel1\nNAME Bob ACTION PICK yellow_trapezoid PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "61", "target": "11", "label": "EXECUTE\nNAME Alice ACTION PICK pink_polygon PLACE panel3\nNAME Bob ACTION WAIT\nNAME Chad ACTION PICK yellow_trapezoid PLACE panel6\n", "weight": 1.0},
+    {"source": "62", "target": "34", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK blue_square PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    {"source": "62", "target": "47", "label": "EXECUTE\nNAME Alice ACTION WAIT\nNAME Bob ACTION PICK pink_polygon PLACE panel5\nNAME Chad ACTION WAIT\n", "weight": 1.0},
+    ]
+}
+
+        const nodes = remoteData.nodes;
+        const edges = remoteData.edges;
+        nodes.forEach((node) => {
+          if (!node.style) {
+            node.style = {};
+          }
+          node.style.lineWidth = 1;
+          node.style.stroke = '#666';
+          node.style.fill = 'steelblue';
+          switch (node.class) {
+            case 'state': {
+              node.type = 'rect';
+              node.size = [180, 200];
+              break;
+            }
+            case 'c1': {
+              node.type = 'rect';
+              node.size = [35, 20];
+              break;
+            }
+          }
+        });
+        edges.forEach((edge) => {
+          if (!edge.style) {
+            edge.style = {};
+          }
+          edge.style.lineWidth = edge.weight;
+          edge.style.opacity = 0.6;
+          edge.style.stroke = 'grey';
+        });
+
+        graph.data(remoteData);
+        graph.render();
+
+        graph.on('node:mouseenter', (e) => {
+          const nodeItem = e.item;
+          graph.setItemState(nodeItem, 'hover', true);
+        });
+        graph.on('node:mouseleave', (e) => {
+          const nodeItem = e.item;
+          graph.setItemState(nodeItem, 'hover', false);
+        });
+        graph.on('node:click', (e) => {
+          const clickNodes = graph.findAllByState('node', 'click');
+          clickNodes.forEach((cn) => {
+            graph.setItemState(cn, 'click', false);
+          });
+          const nodeItem = e.item;
+          graph.setItemState(nodeItem, 'click', true);
+        });
+        graph.on('edge:click', (e) => {
+          const clickEdges = graph.findAllByState('edge', 'click');
+          clickEdges.forEach((ce) => {
+            graph.setItemState(ce, 'click', false);
+          });
+          const edgeItem = e.item;
+          graph.setItemState(edgeItem, 'click', true);
+        });
+      };
+      main();
+    </script>
+  </body>
+</html>

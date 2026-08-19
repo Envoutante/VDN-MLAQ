@@ -1,0 +1,6512 @@
+nohup: ignoring input
+==== Run 5 starts ====
+============ Case 0 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 15.47
+Time elapsed: 8.71
+Time elapsed: 6.25
+----- Check the action -----
+Time elapsed: 7.95
+Time elapsed: 1.22
+----- Imagine the transition -----
+Time elapsed: 3.88
+----- Check the prediction -----
+Time elapsed: 5.91
+Time elapsed: 2.07
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 21.08
+Time elapsed: 9.18
+----- Check the action -----
+Time elapsed: 8.76
+Time elapsed: 1.27
+----- Imagine the transition -----
+Time elapsed: 5.59
+----- Check the prediction -----
+Time elapsed: 9.38
+Time elapsed: 1.66
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 91 frames, saved to data\sort_dialog\run_5\case_0\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 167 frames, saved to data\sort_dialog\run_5\case_0\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 0 ends ============
+
+
+============ Case 1 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 13.79
+Time elapsed: 9.75
+Time elapsed: 5.98
+----- Check the action -----
+Time elapsed: 14.33
+Time elapsed: 1.63
+----- Imagine the transition -----
+Time elapsed: 4.77
+----- Check the prediction -----
+Time elapsed: 6.53
+Time elapsed: 1.53
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 20.87
+Time elapsed: 10.44
+----- Check the action -----
+Time elapsed: 16.63
+Time elapsed: 4.41
+----- Imagine the transition -----
+Time elapsed: 3.47
+----- Check the prediction -----
+Time elapsed: 7.17
+Time elapsed: 1.47
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_1\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 215 frames, saved to data\sort_dialog\run_5\case_1\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 1 ends ============
+
+
+============ Case 2 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 20.65
+----- Check the action -----
+Time elapsed: 9.82
+Time elapsed: 1.39
+----- Re-plan the action -----
+Time elapsed: 15.77
+Time elapsed: 19.23
+Time elapsed: 6.66
+----- Check the action -----
+Time elapsed: 12.34
+Time elapsed: 0.97
+----- Imagine the transition -----
+Time elapsed: 4.59
+----- Check the prediction -----
+Time elapsed: 7.63
+Time elapsed: 1.33
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 23.30
+----- Check the action -----
+Time elapsed: 16.93
+Time elapsed: 1.48
+----- Imagine the transition -----
+Time elapsed: 3.64
+----- Check the prediction -----
+Time elapsed: 7.94
+Time elapsed: 1.38
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 127 frames, saved to data\sort_dialog\run_5\case_2\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 331 frames, saved to data\sort_dialog\run_5\case_2\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 2 ends ============
+
+
+============ Case 3 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 14.31
+Time elapsed: 9.93
+Time elapsed: 5.24
+----- Check the action -----
+Time elapsed: 17.28
+Time elapsed: 1.46
+----- Imagine the transition -----
+Time elapsed: 4.90
+----- Check the prediction -----
+Time elapsed: 8.34
+Time elapsed: 1.51
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 13.66
+----- Check the action -----
+Time elapsed: 9.97
+Time elapsed: 1.71
+----- Imagine the transition -----
+Time elapsed: 5.14
+----- Check the prediction -----
+Time elapsed: 7.69
+Time elapsed: 1.14
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 131 frames, saved to data\sort_dialog\run_5\case_3\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 269 frames, saved to data\sort_dialog\run_5\case_3\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 3 ends ============
+
+
+============ Case 4 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel4
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel4
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 9.82
+Time elapsed: 11.62
+Time elapsed: 8.97
+----- Check the action -----
+Time elapsed: 21.48
+Time elapsed: 1.77
+----- Imagine the transition -----
+Time elapsed: 6.10
+----- Check the prediction -----
+Time elapsed: 7.80
+Time elapsed: 0.85
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel4
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 149 frames, saved to data\sort_dialog\run_5\case_4\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 225 frames, saved to data\sort_dialog\run_5\case_4\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 4 ends ============
+
+
+============ Case 5 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 8.33
+Time elapsed: 9.45
+Time elapsed: 5.23
+----- Check the action -----
+Time elapsed: 11.76
+Time elapsed: 1.57
+----- Imagine the transition -----
+Time elapsed: 3.94
+----- Check the prediction -----
+Time elapsed: 7.22
+Time elapsed: 1.60
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 10.06
+Time elapsed: 5.30
+Time elapsed: 5.61
+----- Check the action -----
+Time elapsed: 7.35
+Time elapsed: 0.93
+----- Imagine the transition -----
+Time elapsed: 3.26
+----- Check the prediction -----
+Time elapsed: 7.26
+Time elapsed: 1.27
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_5\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 169 frames, saved to data\sort_dialog\run_5\case_5\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 5 ends ============
+
+
+============ Case 6 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 13.75
+Time elapsed: 8.05
+----- Check the action -----
+Time elapsed: 10.82
+Time elapsed: 1.18
+----- Imagine the transition -----
+Time elapsed: 3.61
+----- Check the prediction -----
+Time elapsed: 5.37
+Time elapsed: 1.65
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 18.25
+----- Check the action -----
+Time elapsed: 22.41
+Time elapsed: 1.60
+----- Imagine the transition -----
+Time elapsed: 4.67
+----- Check the prediction -----
+Time elapsed: 9.53
+Time elapsed: 1.03
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 155 frames, saved to data\sort_dialog\run_5\case_6\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 283 frames, saved to data\sort_dialog\run_5\case_6\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 6 ends ============
+
+
+============ Case 7 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 17.44
+Time elapsed: 14.54
+Time elapsed: 30.38
+Time elapsed: 9.53
+----- Check the action -----
+Time elapsed: 6.69
+Time elapsed: 1.26
+----- Imagine the transition -----
+Time elapsed: 5.37
+----- Check the prediction -----
+Time elapsed: 5.64
+Time elapsed: 0.90
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 18.20
+Time elapsed: 5.17
+Time elapsed: 6.11
+----- Check the action -----
+Time elapsed: 8.33
+Time elapsed: 1.51
+----- Imagine the transition -----
+Time elapsed: 5.00
+----- Check the prediction -----
+Time elapsed: 5.69
+Time elapsed: 1.42
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 18.87
+----- Check the action -----
+Time elapsed: 9.44
+Time elapsed: 1.03
+----- Imagine the transition -----
+Time elapsed: 2.63
+----- Check the prediction -----
+Time elapsed: 3.91
+Time elapsed: 1.47
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 91 frames, saved to data\sort_dialog\run_5\case_7\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 243 frames, saved to data\sort_dialog\run_5\case_7\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 315 frames, saved to data\sort_dialog\run_5\case_7\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 30.91
+Time elapsed: 16.91
+Time elapsed: 7.04
+----- Check the action -----
+Time elapsed: 10.94
+Time elapsed: 1.00
+----- Imagine the transition -----
+Time elapsed: 8.78
+----- Check the prediction -----
+Time elapsed: 5.26
+Time elapsed: 1.06
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 9.95
+Time elapsed: 5.05
+Time elapsed: 7.12
+----- Check the action -----
+Time elapsed: 8.84
+Time elapsed: 0.92
+----- Imagine the transition -----
+Time elapsed: 1.54
+----- Check the prediction -----
+Time elapsed: 3.00
+Time elapsed: 2.07
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start testing case 1 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 167 frames, saved to data\sort_dialog\run_5\case_7\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 295 frames, saved to data\sort_dialog\run_5\case_7\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 7 ends ============
+
+
+============ Case 8 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 6.80
+----- Check the action -----
+Time elapsed: 2.52
+Time elapsed: 1.54
+----- Re-plan the action -----
+Time elapsed: 16.79
+Time elapsed: 12.48
+----- Check the action -----
+Time elapsed: 6.13
+Time elapsed: 0.88
+----- Imagine the transition -----
+Time elapsed: 5.45
+----- Check the prediction -----
+Time elapsed: 8.80
+Time elapsed: 1.12
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 145 frames, saved to data\sort_dialog\run_5\case_8\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 273 frames, saved to data\sort_dialog\run_5\case_8\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 8 ends ============
+
+
+============ Case 9 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 32.04
+Time elapsed: 9.73
+Time elapsed: 6.07
+----- Check the action -----
+Time elapsed: 12.52
+Time elapsed: 1.82
+----- Imagine the transition -----
+Time elapsed: 11.11
+----- Check the prediction -----
+Time elapsed: 5.99
+Time elapsed: 2.70
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 159 frames, saved to data\sort_dialog\run_5\case_9\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 233 frames, saved to data\sort_dialog\run_5\case_9\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 9 ends ============
+
+
+============ Case 10 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel4
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel4
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 18.64
+Time elapsed: 10.51
+Time elapsed: 4.41
+----- Check the action -----
+Time elapsed: 14.81
+Time elapsed: 1.12
+----- Imagine the transition -----
+Time elapsed: 6.30
+----- Check the prediction -----
+Time elapsed: 6.18
+Time elapsed: 1.21
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 17.95
+----- Check the action -----
+Time elapsed: 8.21
+Time elapsed: 1.81
+----- Imagine the transition -----
+Time elapsed: 5.21
+----- Check the prediction -----
+Time elapsed: 6.22
+Time elapsed: 1.36
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel4
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 133 frames, saved to data\sort_dialog\run_5\case_10\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 279 frames, saved to data\sort_dialog\run_5\case_10\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 10 ends ============
+
+
+============ Case 11 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 16.89
+Time elapsed: 9.07
+Time elapsed: 7.16
+----- Check the action -----
+Time elapsed: 11.55
+Time elapsed: 1.54
+----- Imagine the transition -----
+Time elapsed: 5.60
+----- Check the prediction -----
+Time elapsed: 10.10
+Time elapsed: 1.50
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 155 frames, saved to data\sort_dialog\run_5\case_11\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 235 frames, saved to data\sort_dialog\run_5\case_11\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 11 ends ============
+
+
+============ Case 12 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel3
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 39.84
+Time elapsed: 7.93
+Time elapsed: 9.13
+----- Check the action -----
+Time elapsed: 9.42
+Time elapsed: 1.21
+----- Imagine the transition -----
+Time elapsed: 2.88
+----- Check the prediction -----
+Time elapsed: 5.60
+Time elapsed: 1.63
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 14.84
+Time elapsed: 7.50
+----- Check the action -----
+Time elapsed: 9.28
+Time elapsed: 1.40
+----- Imagine the transition -----
+Time elapsed: 3.69
+----- Check the prediction -----
+Time elapsed: 5.60
+Time elapsed: 2.45
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_12\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 171 frames, saved to data\sort_dialog\run_5\case_12\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 12 ends ============
+
+
+============ Case 13 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 16.46
+Time elapsed: 8.79
+----- Check the action -----
+Time elapsed: 14.50
+Time elapsed: 1.23
+----- Imagine the transition -----
+Time elapsed: 4.31
+----- Check the prediction -----
+Time elapsed: 5.37
+Time elapsed: 1.84
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 91 frames, saved to data\sort_dialog\run_5\case_13\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 219 frames, saved to data\sort_dialog\run_5\case_13\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 13 ends ============
+
+
+============ Case 14 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel4
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel4
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 18.39
+Time elapsed: 6.32
+Time elapsed: 8.82
+----- Check the action -----
+Time elapsed: 14.12
+Time elapsed: 1.03
+----- Imagine the transition -----
+Time elapsed: 4.06
+----- Check the prediction -----
+Time elapsed: 5.73
+Time elapsed: 2.43
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel4
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 71 frames, saved to data\sort_dialog\run_5\case_14\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 217 frames, saved to data\sort_dialog\run_5\case_14\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 14 ends ============
+
+
+============ Case 15 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 33.60
+Time elapsed: 8.23
+Time elapsed: 6.43
+----- Check the action -----
+Time elapsed: 12.24
+Time elapsed: 1.45
+----- Imagine the transition -----
+Time elapsed: 3.43
+----- Check the prediction -----
+Time elapsed: 5.09
+Time elapsed: 1.59
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 13.36
+Time elapsed: 11.74
+----- Check the action -----
+Time elapsed: 15.66
+Time elapsed: 1.52
+----- Imagine the transition -----
+Time elapsed: 4.09
+----- Check the prediction -----
+Time elapsed: 7.84
+Time elapsed: 1.15
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_15\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 227 frames, saved to data\sort_dialog\run_5\case_15\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 365 frames, saved to data\sort_dialog\run_5\case_15\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 55.22
+----- Check the action -----
+Time elapsed: 12.51
+Time elapsed: 0.84
+----- Imagine the transition -----
+Time elapsed: 4.07
+----- Check the prediction -----
+Time elapsed: 5.35
+Time elapsed: 0.99
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 20.28
+Time elapsed: 13.14
+Time elapsed: 5.65
+----- Check the action -----
+Time elapsed: 9.85
+Time elapsed: 1.20
+----- Imagine the transition -----
+Time elapsed: 3.70
+----- Check the prediction -----
+Time elapsed: 6.38
+Time elapsed: 1.51
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 3th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 42.96
+Time elapsed: 22.07
+Time elapsed: 7.62
+----- Check the action -----
+Time elapsed: 10.07
+Time elapsed: 2.05
+----- Imagine the transition -----
+Time elapsed: 4.63
+----- Check the prediction -----
+Time elapsed: 7.03
+Time elapsed: 0.88
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel1
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+---------- Time step 5 ----------
+----- Use LLM -----
+Time elapsed: 28.93
+----- Check the action -----
+Time elapsed: 22.27
+Time elapsed: 1.37
+----- Imagine the transition -----
+Time elapsed: 4.89
+----- Check the prediction -----
+Time elapsed: 7.57
+Time elapsed: 1.08
+Imagination step 5:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 3th round imagination --------------
+
+-------------- Start 4th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 25.95
+Time elapsed: 29.94
+Time elapsed: 11.63
+Time elapsed: 14.43
+----- Check the action -----
+Time elapsed: 13.71
+Time elapsed: 1.31
+----- Imagine the transition -----
+Time elapsed: 2.88
+----- Check the prediction -----
+Time elapsed: 5.34
+Time elapsed: 1.26
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 18.77
+Time elapsed: 22.85
+Time elapsed: 8.44
+----- Check the action -----
+The action is valid because it is in the full memory.
+Transition exists. Use the existing transition.
+
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 14.53
+Time elapsed: 15.55
+----- Check the action -----
+The action is valid because it is in the full memory.
+Transition exists. Use the existing transition.
+
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 4th round imagination --------------
+
+-------------- Start 5th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 23.77
+Time elapsed: 6.87
+----- Check the action -----
+Time elapsed: 10.53
+Time elapsed: 1.21
+----- Imagine the transition -----
+Time elapsed: 3.97
+----- Check the prediction -----
+Time elapsed: 7.23
+Time elapsed: 1.51
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 7.67
+Time elapsed: 6.24
+----- Check the action -----
+The action is valid because it is in the full memory.
+Transition exists. Use the existing transition.
+
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 5th round imagination --------------
+
+-------------- Start 6th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 37.48
+Time elapsed: 9.18
+----- Check the action -----
+Time elapsed: 15.52
+Time elapsed: 1.45
+----- Imagine the transition -----
+Time elapsed: 5.62
+----- Check the prediction -----
+Time elapsed: 9.19
+Time elapsed: 1.14
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 6th round imagination --------------
+
+-------------- Start 7th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 38.42
+Time elapsed: 11.45
+Time elapsed: 8.93
+----- Check the action -----
+Time elapsed: 10.18
+Time elapsed: 1.88
+----- Imagine the transition -----
+Time elapsed: 3.15
+----- Check the prediction -----
+Time elapsed: 5.52
+Time elapsed: 1.05
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel7
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel7
+
+---------- Time step 5 ----------
+----- Use LLM -----
+Time elapsed: 44.95
+----- Check the action -----
+Time elapsed: 8.24
+Time elapsed: 1.64
+----- Imagine the transition -----
+Time elapsed: 4.28
+----- Check the prediction -----
+Time elapsed: 5.21
+Time elapsed: 1.91
+Imagination step 5:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 7th round imagination --------------
+
+-------------- Start testing case 1 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_15\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 227 frames, saved to data\sort_dialog\run_5\case_15\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 365 frames, saved to data\sort_dialog\run_5\case_15\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+-------------- Start 8th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel4
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 4 ----------
+----- Use memory -----
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel7
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel7
+
+---------- Time step 5 ----------
+----- Use LLM -----
+Time elapsed: 43.52
+Time elapsed: 11.20
+----- Check the action -----
+Time elapsed: 12.45
+Time elapsed: 1.23
+----- Imagine the transition -----
+Time elapsed: 6.55
+----- Check the prediction -----
+Time elapsed: 8.24
+Time elapsed: 1.90
+Imagination step 5:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 8th round imagination --------------
+
+-------------- Start testing case 2 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_15\interact\round_2\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 227 frames, saved to data\sort_dialog\run_5\case_15\interact\round_2\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 365 frames, saved to data\sort_dialog\run_5\case_15\interact\round_2\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+============ Case 15 ends ============
+
+
+============ Case 16 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 13.79
+Time elapsed: 16.44
+Time elapsed: 6.94
+----- Check the action -----
+Time elapsed: 12.65
+Time elapsed: 1.13
+----- Imagine the transition -----
+Time elapsed: 2.66
+----- Check the prediction -----
+Time elapsed: 5.99
+Time elapsed: 0.99
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 75 frames, saved to data\sort_dialog\run_5\case_16\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 215 frames, saved to data\sort_dialog\run_5\case_16\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 16 ends ============
+
+
+============ Case 17 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 21.53
+Time elapsed: 7.99
+----- Check the action -----
+Time elapsed: 10.39
+Time elapsed: 2.08
+----- Imagine the transition -----
+Time elapsed: 3.75
+----- Check the prediction -----
+Time elapsed: 9.59
+Time elapsed: 1.23
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 11.71
+----- Check the action -----
+Time elapsed: 21.18
+Time elapsed: 2.20
+----- Imagine the transition -----
+Time elapsed: 4.50
+----- Check the prediction -----
+Time elapsed: 7.52
+Time elapsed: 1.40
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6  
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 157 frames, saved to data\sort_dialog\run_5\case_17\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 341 frames, saved to data\sort_dialog\run_5\case_17\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6  
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 17 ends ============
+
+
+============ Case 18 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel2
+yellow_trapezoid is on panel5
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 143 frames, saved to data\sort_dialog\run_5\case_18\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 281 frames, saved to data\sort_dialog\run_5\case_18\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 18 ends ============
+
+
+============ Case 19 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel4
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel4
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 22.44
+Time elapsed: 10.88
+Time elapsed: 9.08
+----- Check the action -----
+Time elapsed: 12.59
+Time elapsed: 1.31
+----- Imagine the transition -----
+Time elapsed: 3.80
+----- Check the prediction -----
+Time elapsed: 9.67
+Time elapsed: 3.05
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel4
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 139 frames, saved to data\sort_dialog\run_5\case_19\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 283 frames, saved to data\sort_dialog\run_5\case_19\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 19 ends ============
+
+
+============ Case 20 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 20.42
+Time elapsed: 6.94
+----- Check the action -----
+Time elapsed: 18.05
+Time elapsed: 1.21
+----- Imagine the transition -----
+Time elapsed: 4.30
+----- Check the prediction -----
+Time elapsed: 12.97
+Time elapsed: 1.51
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PINK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Failed to parse action: EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PINK pink_polygon PLACE panel5
+
+This previous [Action] failed to parse!: 'EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PINK pink_polygon PLACE panel5
+'
+Object panel5 cannot be parsed, bad format. Re-format to strictly follow [Action Output Instruction]!
+Remove the current state and its children from the language tree.
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 19.85
+Time elapsed: 9.52
+Time elapsed: 6.67
+----- Check the action -----
+Time elapsed: 13.21
+Time elapsed: 1.54
+----- Imagine the transition -----
+Time elapsed: 3.42
+----- Check the prediction -----
+Time elapsed: 6.62
+Time elapsed: 1.05
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 163 frames, saved to data\sort_dialog\run_5\case_20\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 291 frames, saved to data\sort_dialog\run_5\case_20\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 20 ends ============
+
+
+============ Case 21 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 28.44
+Time elapsed: 13.40
+Time elapsed: 8.48
+----- Check the action -----
+Time elapsed: 7.90
+Time elapsed: 1.89
+----- Imagine the transition -----
+Time elapsed: 7.25
+----- Check the prediction -----
+Time elapsed: 5.72
+Time elapsed: 1.72
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 91 frames, saved to data\sort_dialog\run_5\case_21\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 237 frames, saved to data\sort_dialog\run_5\case_21\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 365 frames, saved to data\sort_dialog\run_5\case_21\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 51.54
+----- Check the action -----
+Time elapsed: 8.49
+Time elapsed: 1.45
+----- Re-plan the action -----
+Time elapsed: 42.76
+Time elapsed: 12.30
+----- Check the action -----
+Time elapsed: 21.96
+Time elapsed: 1.02
+----- Imagine the transition -----
+Time elapsed: 5.17
+----- Check the prediction -----
+Time elapsed: 5.80
+Time elapsed: 1.26
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 8.57
+Time elapsed: 12.17
+----- Check the action -----
+Time elapsed: 14.79
+Time elapsed: 1.50
+----- Imagine the transition -----
+Time elapsed: 4.58
+----- Check the prediction -----
+Time elapsed: 7.36
+Time elapsed: 1.13
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2  
+pink_polygon is on panel4  
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 9.60
+Time elapsed: 3.14
+----- Check the action -----
+Time elapsed: 7.83
+Time elapsed: 1.96
+----- Re-plan the action -----
+Time elapsed: 17.18
+----- Check the action -----
+Time elapsed: 22.44
+Time elapsed: 1.06
+----- Imagine the transition -----
+Time elapsed: 5.06
+----- Check the prediction -----
+Time elapsed: 6.58
+Time elapsed: 1.22
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 3th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2  
+pink_polygon is on panel4  
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 10.87
+----- Check the action -----
+Time elapsed: 7.03
+Time elapsed: 1.48
+----- Re-plan the action -----
+Time elapsed: 17.73
+Time elapsed: 6.13
+----- Check the action -----
+Time elapsed: 16.62
+Time elapsed: 1.45
+----- Imagine the transition -----
+Time elapsed: 4.25
+----- Check the prediction -----
+Time elapsed: 8.94
+Time elapsed: 0.92
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 3th round imagination --------------
+
+-------------- Start 4th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 48.27
+----- Check the action -----
+Time elapsed: 8.94
+Time elapsed: 0.91
+----- Imagine the transition -----
+Time elapsed: 4.90
+----- Check the prediction -----
+Time elapsed: 13.16
+Time elapsed: 1.40
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel4  
+NAME Chad ACTION WAIT  
+
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 16.00
+Time elapsed: 12.41
+Time elapsed: 9.76
+----- Check the action -----
+The action is valid because it is in the full memory.
+Transition exists. Use the existing transition.
+
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2  
+pink_polygon is on panel4  
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 9.27
+----- Check the action -----
+Time elapsed: 14.43
+Time elapsed: 1.77
+----- Re-plan the action -----
+Time elapsed: 27.36
+Time elapsed: 23.12
+----- Check the action -----
+Time elapsed: 12.88
+Time elapsed: 1.08
+----- Imagine the transition -----
+Time elapsed: 6.11
+----- Check the prediction -----
+Time elapsed: 13.81
+Time elapsed: 1.72
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 4th round imagination --------------
+
+-------------- Start 5th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel4  
+NAME Chad ACTION WAIT  
+
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2  
+pink_polygon is on panel4  
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 5.92
+Time elapsed: 5.98
+----- Check the action -----
+Time elapsed: 11.44
+Time elapsed: 1.92
+----- Re-plan the action -----
+Time elapsed: 39.24
+Time elapsed: 19.76
+Time elapsed: 6.04
+----- Check the action -----
+Time elapsed: 10.65
+Time elapsed: 1.53
+----- Imagine the transition -----
+Time elapsed: 4.80
+----- Check the prediction -----
+Time elapsed: 5.80
+Time elapsed: 1.26
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 5th round imagination --------------
+
+-------------- Start 6th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel4  
+NAME Chad ACTION WAIT  
+
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2  
+pink_polygon is on panel4  
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 7.73
+Time elapsed: 6.44
+----- Check the action -----
+Time elapsed: 4.07
+Time elapsed: 1.15
+----- Re-plan the action -----
+Time elapsed: 32.13
+Time elapsed: 8.76
+Time elapsed: 6.47
+----- Check the action -----
+Time elapsed: 16.09
+Time elapsed: 1.34
+----- Imagine the transition -----
+Time elapsed: 4.13
+----- Check the prediction -----
+Time elapsed: 6.41
+Time elapsed: 0.92
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 6th round imagination --------------
+
+-------------- Start 7th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel4  
+NAME Chad ACTION WAIT  
+
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 22.01
+Time elapsed: 15.75
+----- Check the action -----
+Time elapsed: 11.35
+Time elapsed: 1.53
+----- Re-plan the action -----
+Time elapsed: 24.73
+----- Check the action -----
+Time elapsed: 12.74
+Time elapsed: 1.71
+----- Re-plan the action -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 30.69
+Time elapsed: 25.84
+Time elapsed: 8.17
+----- Check the action -----
+Time elapsed: 27.44
+Time elapsed: 1.40
+----- Imagine the transition -----
+Time elapsed: 3.35
+----- Check the prediction -----
+Time elapsed: 4.34
+Time elapsed: 0.91
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 17.71
+Time elapsed: 11.07
+Time elapsed: 4.45
+----- Check the action -----
+Time elapsed: 7.56
+Time elapsed: 1.51
+----- Imagine the transition -----
+Time elapsed: 2.21
+----- Check the prediction -----
+Time elapsed: 6.07
+Time elapsed: 0.90
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 7th round imagination --------------
+
+-------------- Start testing case 1 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 91 frames, saved to data\sort_dialog\run_5\case_21\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 237 frames, saved to data\sort_dialog\run_5\case_21\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 365 frames, saved to data\sort_dialog\run_5\case_21\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+-------------- Start 8th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel4  
+NAME Chad ACTION WAIT  
+
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 30.42
+Time elapsed: 7.33
+Time elapsed: 10.46
+----- Check the action -----
+Time elapsed: 8.92
+Time elapsed: 1.75
+----- Imagine the transition -----
+Time elapsed: 3.52
+----- Check the prediction -----
+Time elapsed: 7.62
+Time elapsed: 1.30
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 37.34
+Time elapsed: 7.01
+----- Check the action -----
+Time elapsed: 20.45
+Time elapsed: 0.83
+----- Imagine the transition -----
+Time elapsed: 4.98
+----- Check the prediction -----
+Time elapsed: 9.47
+Time elapsed: 0.90
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 8th round imagination --------------
+
+-------------- Start testing case 2 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel5
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 91 frames, saved to data\sort_dialog\run_5\case_21\interact\round_2\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK blue_square PLACE panel3  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel6
+yellow_trapezoid is on panel7
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 237 frames, saved to data\sort_dialog\run_5\case_21\interact\round_2\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2  
+NAME Bob ACTION WAIT  
+NAME Chad ACTION PICK pink_polygon PLACE panel5  
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 365 frames, saved to data\sort_dialog\run_5\case_21\interact\round_2\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+============ Case 21 ends ============
+
+
+============ Case 22 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 35.12
+Time elapsed: 13.96
+----- Check the action -----
+Time elapsed: 12.50
+Time elapsed: 1.11
+----- Imagine the transition -----
+Time elapsed: 8.27
+----- Check the prediction -----
+Time elapsed: 6.64
+Time elapsed: 1.83
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 87 frames, saved to data\sort_dialog\run_5\case_22\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 239 frames, saved to data\sort_dialog\run_5\case_22\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 2 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 319 frames, saved to data\sort_dialog\run_5\case_22\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 3 timesteps
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 3 ----------
+----- Use memory -----
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 2th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use LLM -----
+Time elapsed: 29.16
+Time elapsed: 34.34
+Time elapsed: 12.32
+Time elapsed: 5.85
+----- Check the action -----
+Time elapsed: 8.47
+Time elapsed: 1.42
+----- Imagine the transition -----
+Time elapsed: 5.19
+----- Check the prediction -----
+Time elapsed: 5.84
+Time elapsed: 1.34
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 8.11
+----- Check the action -----
+Time elapsed: 7.69
+Time elapsed: 1.19
+----- Re-plan the action -----
+Time elapsed: 16.13
+----- Check the action -----
+Time elapsed: 10.44
+Time elapsed: 2.12
+----- Imagine the transition -----
+Time elapsed: 3.72
+----- Check the prediction -----
+Time elapsed: 6.67
+Time elapsed: 1.32
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 2th round imagination --------------
+
+-------------- Start 3th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 24.22
+----- Check the action -----
+Time elapsed: 7.12
+Time elapsed: 2.30
+----- Re-plan the action -----
+Time elapsed: 18.36
+Time elapsed: 7.85
+----- Check the action -----
+Time elapsed: 38.50
+Time elapsed: 1.20
+----- Imagine the transition -----
+Time elapsed: 3.45
+----- Check the prediction -----
+Time elapsed: 5.70
+Time elapsed: 1.71
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 23.77
+Time elapsed: 11.85
+Time elapsed: 3.06
+----- Check the action -----
+The action is valid because it is in the full memory.
+Transition exists. Use the existing transition.
+
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 3th round imagination --------------
+
+-------------- Start 4th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 54.87
+Time elapsed: 21.60
+Time elapsed: 7.32
+----- Check the action -----
+Time elapsed: 14.54
+Time elapsed: 1.74
+----- Imagine the transition -----
+Time elapsed: 10.31
+----- Check the prediction -----
+Time elapsed: 10.67
+Time elapsed: 1.08
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 3 ----------
+----- Use LLM -----
+Time elapsed: 54.75
+----- Check the action -----
+Time elapsed: 13.07
+Time elapsed: 1.29
+----- Imagine the transition -----
+Time elapsed: 4.44
+----- Check the prediction -----
+Time elapsed: 7.21
+Time elapsed: 1.01
+Imagination step 3:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel1
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+---------- Time step 4 ----------
+----- Use LLM -----
+Time elapsed: 25.16
+----- Check the action -----
+The action is valid because it is in the full memory.
+Transition exists. Use the existing transition.
+
+Imagination step 4:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 4th round imagination --------------
+
+-------------- Start testing case 1 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 155 frames, saved to data\sort_dialog\run_5\case_22\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 299 frames, saved to data\sort_dialog\run_5\case_22\interact\round_1\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 22 ends ============
+
+
+============ Case 23 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 12.21
+Time elapsed: 7.61
+Time elapsed: 5.05
+----- Check the action -----
+Time elapsed: 9.50
+Time elapsed: 1.67
+----- Imagine the transition -----
+Time elapsed: 4.14
+----- Check the prediction -----
+Time elapsed: 8.15
+Time elapsed: 1.94
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel1
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 145 frames, saved to data\sort_dialog\run_5\case_23\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK pink_polygon PLACE panel3
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel3
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 225 frames, saved to data\sort_dialog\run_5\case_23\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 23 ends ============
+
+
+============ Case 24 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 15.09
+Time elapsed: 8.59
+----- Check the action -----
+Time elapsed: 9.64
+Time elapsed: 1.33
+----- Imagine the transition -----
+Time elapsed: 3.60
+----- Check the prediction -----
+Time elapsed: 5.61
+Time elapsed: 1.30
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 95 frames, saved to data\sort_dialog\run_5\case_24\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 169 frames, saved to data\sort_dialog\run_5\case_24\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 24 ends ============
+
+
+============ Case 25 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 18.41
+Time elapsed: 7.86
+Time elapsed: 4.66
+----- Check the action -----
+Time elapsed: 9.69
+Time elapsed: 1.49
+----- Imagine the transition -----
+Time elapsed: 3.48
+----- Check the prediction -----
+Time elapsed: 6.01
+Time elapsed: 1.11
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel4
+pink_polygon is on panel5
+yellow_trapezoid is on panel7
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 143 frames, saved to data\sort_dialog\run_5\case_25\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION PICK blue_square PLACE panel3
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 271 frames, saved to data\sort_dialog\run_5\case_25\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK pink_polygon PLACE panel4
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 25 ends ============
+
+
+============ Case 26 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel4
+yellow_trapezoid is on panel3
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel4
+yellow_trapezoid is on panel3
+
+---------- Time step 1 ----------
+----- Use LLM -----
+Time elapsed: 20.40
+Time elapsed: 14.34
+Time elapsed: 6.92
+----- Check the action -----
+Time elapsed: 14.29
+Time elapsed: 1.91
+----- Imagine the transition -----
+Time elapsed: 4.13
+----- Check the prediction -----
+Time elapsed: 7.60
+Time elapsed: 1.00
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel1
+pink_polygon is on panel4
+yellow_trapezoid is on panel3
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 151 frames, saved to data\sort_dialog\run_5\case_26\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION PICK yellow_trapezoid PLACE panel5
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel5
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 235 frames, saved to data\sort_dialog\run_5\case_26\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK yellow_trapezoid PLACE panel6
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 26 ends ============
+
+
+============ Case 27 starts ============
+---------- Task Information ----------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+
+Target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+
+Initial Information:
+nothing
+
+-------------------------------------
+-------------- Start 1th round imagination --------------
+Original state:
+[State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+---------- Time step 1 ----------
+----- Use memory -----
+Imagination step 1:
+EXECUTE
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+---------- Time step 2 ----------
+----- Use memory -----
+Imagination step 2:
+EXECUTE
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Imagination reaches the target state:
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+-------------- End 1th round imagination --------------
+
+-------------- Start testing case 0 --------------
+Initial state: [State]
+[Cube States]
+blue_square is on panel3
+pink_polygon is on panel7
+yellow_trapezoid is on panel6
+
+Target state: [State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+------ Step 0 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 151 frames, saved to data\sort_dialog\run_5\case_27\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION PICK blue_square PLACE panel2
+NAME Bob ACTION WAIT
+NAME Chad ACTION PICK pink_polygon PLACE panel5
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel5
+yellow_trapezoid is on panel6
+
+------ Step 1 ------
+Given 6 waypoints, found 6 valid waypoints via IK
+Given 6 waypoints, found 6 valid waypoints via IK
+Found a path to return to Home
+Video gif, total 225 frames, saved to data\sort_dialog\run_5\case_27\interact\round_0\replay_video.mp4
+Action: 
+NAME Alice ACTION WAIT  
+NAME Bob ACTION PICK pink_polygon PLACE panel4  
+NAME Chad ACTION WAIT
+State: 
+[State]
+[Cube States]
+blue_square is on panel2
+pink_polygon is on panel4
+yellow_trapezoid is on panel6
+
+Run finished after 2 timesteps
+
+============ Case 27 ends ============
+
+
