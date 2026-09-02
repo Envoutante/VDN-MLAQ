@@ -11,6 +11,7 @@ from typing import Dict
 from datetime import datetime
 
 from prompting.lang_tree import LangTree, preprocess_state, preprocess_action
+from prompting.paths import exp_output_dir
 from rocobench.envs import EnvState
 
 # assert os.path.exists("openai_key.json"), "Please put your OpenAI API key in a string in robot-collab/openai_key.json"
@@ -42,7 +43,8 @@ class DialogModelPrompter:
     def __init__(
             self,
             env, parser, feedback_manager,
-            epoch_id: int = 0,
+            epoch_id=0,
+            data_dir: str = "data",
             max_tokens: int = 512,
             debug_mode: bool = False,
             use_waypoints: bool = False,
@@ -73,10 +75,7 @@ class DialogModelPrompter:
         self.max_calls_per_round = max_calls_per_round
         self.temperature = temperature
         self.llm_source = llm_source
-        if epoch_id == 0:
-            self.memory_path = 'data/{}/memory.pth'.format(self.env.name)
-        else:
-            self.memory_path = 'data/{}/memory.pth'.format(self.env.name + '_{}'.format(epoch_id))
+        self.memory_path = path.join(exp_output_dir(self.env.name, epoch_id, data_dir), 'memory.pth')
 
         self.skip_check_memory = skip_check_memory
         self.state_desp = None
@@ -128,10 +127,11 @@ class DialogModelPrompter:
         self.action = None
 
         # 实例化永久语言树
-        if epoch_id == 0:
-            self.lang_tree = LangTree(load=load, if_temp_tree=False, tree_path='data/{}/lang_tree.pth'.format(self.env.name))
-        else:
-            self.lang_tree = LangTree(load=load, if_temp_tree=False, tree_path='data/{}/lang_tree.pth'.format(self.env.name + '_{}'.format(epoch_id)))
+        self.lang_tree = LangTree(
+            load=load,
+            if_temp_tree=False,
+            tree_path=path.join(exp_output_dir(self.env.name, epoch_id, data_dir), 'lang_tree.pth'),
+        )
 
         self.temp_lang_tree = LangTree(load=False, if_temp_tree=True)
         self.case_dir, self.simulate_save_dir, self.interact_save_dir = None, None, None

@@ -12,6 +12,7 @@ from datetime import datetime
 from typing import List, Tuple, Dict, Union, Optional, Any
 from rocobench import PlannedPathPolicy, LLMPathPlan, MultiArmRRT
 from prompting import LLMResponseParser, FeedbackManager, ModelPrompter
+from prompting.paths import exp_output_dir
 from rocobench.envs import SortOneBlockTask, MakeSandwichTask, MujocoSimEnv, SimRobot, visualize_voxel_scene
 from rocobench.dialog_envs import SortOneBlockTask as SortOneBlockDialogTask
 from rocobench.dialog_envs import MakeSandwichTask as MakeSandwichDialogTask
@@ -65,12 +66,8 @@ class LLMRunner:
         self.data_dir = data_dir
         self.run_name = run_name
 
-        # NOTE: the run directory is data/env_name
-        if epoch_id == 0:
-            run_dir = os.path.join(self.data_dir, self.env.name)
-        else:
-            run_dir = os.path.join(self.data_dir, self.env.name + '_{}'.format(epoch_id))
-
+        # NOTE: the run directory is data/env_name, or data/env_name/<epoch_id> (epoch_id = "<算法>/<YYYYMMDD_HHMM>")
+        run_dir = exp_output_dir(self.env.name, epoch_id, self.data_dir)
         os.makedirs(run_dir, exist_ok=overwrite)
         self.run_dir = run_dir
         self.verbose = verbose
@@ -129,6 +126,7 @@ class LLMRunner:
             self.prompter = DialogModelPrompter(
                 env=self.env,
                 epoch_id=epoch_id,
+                data_dir=self.data_dir,
                 parser=self.parser,
                 feedback_manager=self.feedback_manager,
                 max_tokens=3000,
@@ -147,6 +145,8 @@ class LLMRunner:
         else:
             self.prompter = ModelPrompter(
                 env=self.env,
+                epoch_id=epoch_id,
+                data_dir=self.data_dir,
                 parser=self.parser,
                 feedback_manager=self.feedback_manager,
                 max_tokens=3000,

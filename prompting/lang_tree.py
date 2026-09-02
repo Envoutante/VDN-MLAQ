@@ -599,7 +599,8 @@ class Tree2HtmlTranslator:
 
 if __name__ == "__main__":
     # ===== 在此处填写要绘制的树文件路径（.pth），然后直接运行 =====
-    tree_path = "data\\sort_dialog\\run_2\\case_1\\lang_tree.pth"
+    # 例如: "data/sort_dialog/mlaq/20260729_1906/run_2/case_1/lang_tree.pth"
+    tree_path = "data\\sort_dialog\\mlaq\\20260729_1906\\run_2\\case_1\\lang_tree.pth"
     tree = LangTree(load=False)
     try:
         # torch.load 需要找到 prompting.lang_tree.LangTree, 确保父目录在 sys.path

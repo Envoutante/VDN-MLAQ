@@ -73,6 +73,11 @@ openai.api_key = OPENAI_KEY
 
 
 def main(args):
+    # 本次实验的输出标识: <算法>/<YYYYMMDD_HHMM>，落到 data/<task>/<epoch_id> 下
+    # 每次启动自动追加分钟时间戳，避免不同算法/批次互相覆盖。
+    # 若显式传 --epoch（如 run_benchmark 多阶段续跑要固定同一批次），则原样使用
+    epoch_id = args.epoch if args.epoch else "{}/{}".format(args.algo, datetime.now().strftime("%Y%m%d_%H%M"))
+
     if args.task in ['sort_dialog', 'sandwich_dialog', 'sort_central', 'sandwich_central']:
         assert args.task in TASK_NAME_MAP.keys(), f"Task {args.task} not supported"
         env_cl = TASK_NAME_MAP[args.task]
@@ -113,6 +118,7 @@ def main(args):
             max_runner_steps=args.tsteps,
             num_runs=args.num_runs,
             run_name=args.run_name,
+            epoch_id=epoch_id,
             overwrite=True,
             skip_display=args.skip_display,
             llm_output_mode=args.output_mode,  # "action_only" or "action_and_path"
@@ -153,6 +159,7 @@ def main(args):
             max_runner_steps=args.tsteps,
             num_runs=args.num_runs,
             run_name=args.run_name,
+            epoch_id=epoch_id,
             overwrite=True,
             skip_display=args.skip_display,
             llm_num_replans=args.num_replans,
@@ -176,6 +183,8 @@ if __name__ == "__main__":
 
     # special parameters in LAQ
     parser.add_argument("--data_dir", "-d", type=str, default="data")
+    parser.add_argument("--algo", type=str, default="mlaq", help="算法标签，输出落在 data/<task>/<algo>/<时间>/ 下，用于区分不同算法")
+    parser.add_argument("--epoch", type=str, default="", help="显式指定批次标识（如 mlaq/20260729_1906），覆盖自动时间戳；供 run_benchmark 等多阶段续跑固定同一批次")
     parser.add_argument("--task", type=str, default="sandwich_dialog")  # "sandwich_dialog", "sort_dialog", "sandwich_central", "sort_central", "blocksworld"
     parser.add_argument("--start_run_id", "-sri", type=int, default=0)
     parser.add_argument("--start_case_id", "-sci", type=int, default=0)

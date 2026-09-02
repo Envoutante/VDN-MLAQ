@@ -2,9 +2,16 @@
 按 optimal_steps 从 1 到 N 依次运行实验
 每步完成后自动保存 lang_tree，由下一步加载
 
+输出遵循 data/<task>/<algo>/<批次>/ 目录约定（变体 B）：
+整个 benchmark 的一次完整运行落在同一个批次里，例如
+    data/sort_dialog/mlaq/20260729_1906/
+        run_0/ ... run_5/        # 每个 optimal_steps 一步
+        lang_tree.pth  memory.pth
+
 用法：
-    python run_benchmark.py                    # 默认配置
-    python run_benchmark.py --max_opt 4        # 只跑到 optimal_steps=4
+    python run_benchmark.py                          # 默认配置，新建一个批次
+    python run_benchmark.py --max_opt 4              # 只跑到 optimal_steps=4
+    python run_benchmark.py --epoch mlaq/20260729_1906   # 续跑/复用指定批次
 """
 
 import subprocess
@@ -12,9 +19,11 @@ import sys
 import os
 import shutil
 import re
+from datetime import datetime
 
 # ---------- 默认配置 ----------
 TASK = "sort_dialog"
+ALGO = "mlaq"
 LLM_SOURCE = "deepseek-v4-flash"
 TSTEPS = 8
 NUM_RUNS = 1
@@ -76,14 +85,35 @@ def _find_resume_point(data_root: str):
 def main():
     # 解析简易参数
     max_opt = MAX_OPTIMAL_STEPS
-    for arg in sys.argv[1:]:
-        if arg.startswith("--max_opt="):
+    algo = ALGO
+    epoch = None
+    i = 1
+    while i < len(sys.argv):
+        arg = sys.argv[i]
+        if arg == "--max_opt" and i + 1 < len(sys.argv):
+            max_opt = int(sys.argv[i + 1]); i += 1
+        elif arg.startswith("--max_opt="):
             max_opt = int(arg.split("=")[1])
-        elif arg.startswith("--max_opt") and len(sys.argv) > sys.argv.index(arg) + 1:
-            max_opt = int(sys.argv[sys.argv.index(arg) + 1])
+        elif arg == "--algo" and i + 1 < len(sys.argv):
+            algo = sys.argv[i + 1]; i += 1
+        elif arg.startswith("--algo="):
+            algo = arg.split("=")[1]
+        elif arg == "--epoch" and i + 1 < len(sys.argv):
+            epoch = sys.argv[i + 1]; i += 1
+        elif arg.startswith("--epoch="):
+            epoch = arg.split("=")[1]
+        i += 1
 
     project_root = os.path.dirname(os.path.abspath(__file__))
-    data_root = os.path.join(project_root, "data", TASK)
+    # 批次标识: 未显式指定时按当前时间新建一个，保证每次完整 benchmark 独立成批
+    if epoch is None:
+        epoch = "{}/{}".format(algo, datetime.now().strftime("%Y%m%d_%H%M"))
+    else:
+        algo = epoch.split("/")[0]
+    # data_root = data/<task>/<algo>/<YYYYMMDD_HHMM>
+    data_root = os.path.join(project_root, "data", TASK, *epoch.split("/"))
+    print(f"本批次输出目录: {data_root}")
+    os.makedirs(data_root, exist_ok=True)
 
     # 断点续跑：找到上次中断的位置
     resume_run_id, resume_case_id, restored_tree = _find_resume_point(data_root)
@@ -91,6 +121,8 @@ def main():
     base_args = [
         sys.executable, "run_MLAQ.py",
         "--task", TASK,
+        "--algo", algo,
+        "--epoch", epoch,
         "--llm_source", LLM_SOURCE,
         "--tsteps", str(TSTEPS),
         "--num_runs", str(NUM_RUNS),
@@ -121,7 +153,7 @@ def main():
         result = subprocess.run(args, cwd=project_root)
         if result.returncode != 0:
             print(f"ERROR: optimal_steps={opt} failed with code {result.returncode}")
-            print(f"  Resume command: cd {project_root} && python run_benchmark.py")
+            print(f"  Resume command: cd {project_root} && python run_benchmark.py --epoch {epoch}")
             sys.exit(1)
 
         print(f"  optimal_steps = {opt} completed")

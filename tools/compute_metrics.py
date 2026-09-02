@@ -269,13 +269,15 @@ def print_metrics_table(run_dirs: list, header: list = None):
 
 
 if __name__ == "__main__":
+    # 旧批次已迁移到 data/<task>/<algo>/<YYYYMMDD_HHMM>/（变体 B），run_0..run_5 对应 optimal_steps 1..6
+    BATCH = "data/sort_dialog/mlaq/20260729_1906"
     RUN_DIRS = [
-        "data/sort_dialog/run_0",
-        "data/sort_dialog/run_1",
-        "data/sort_dialog/run_2",
-        "data/sort_dialog/run_3",
-        "data/sort_dialog/run_4",
-        "data/sort_dialog/run_5",
+        f"{BATCH}/run_0",
+        f"{BATCH}/run_1",
+        f"{BATCH}/run_2",
+        f"{BATCH}/run_3",
+        f"{BATCH}/run_4",
+        f"{BATCH}/run_5",
     ]
     project_root = os.path.dirname(os.path.dirname(__file__))
     run_dirs = [os.path.join(project_root, rd) for rd in RUN_DIRS]

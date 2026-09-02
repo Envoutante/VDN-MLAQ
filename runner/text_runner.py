@@ -7,12 +7,14 @@ from glob import glob
 import os.path as path
 from datetime import datetime
 from prompting import TextFeedbackManager, ModelTextPrompter
+from prompting.paths import exp_output_dir
 
 
 class LLMRunner:
     def __init__(
             self, env, max_runner_steps: int = 50, num_runs: int = 1, np_seed: int = 0,
             start_seed: int = 0, run_name: str = "run", data_dir: str = "data", overwrite: bool = False,
+            epoch_id=0,
             llm_num_replans=1, give_env_feedback=True, skip_display=False, debug_mode: bool = False,
             use_history: bool = False, use_feedback: bool = False, temperature: float = 0.0, llm_source: str = "gpt4",
             tree_load: bool = False, skip_check_memory: bool = False
@@ -24,8 +26,8 @@ class LLMRunner:
         self.episode_id = 0
         self.skip_check_memory = skip_check_memory
 
-        # NOTE: the run directory is data/env_name
-        run_dir = os.path.join(self.data_dir, self.env.name)
+        # NOTE: the run directory is data/env_name, or data/env_name/<epoch_id> (epoch_id = "<算法>/<YYYYMMDD_HHMM>")
+        run_dir = exp_output_dir(self.env.name, epoch_id, self.data_dir)
         os.makedirs(run_dir, exist_ok=overwrite)
         self.run_dir = run_dir
         self.np_seed = np_seed
@@ -47,6 +49,8 @@ class LLMRunner:
         self.feedback_manager = TextFeedbackManager(env=self.env)
         self.prompter = ModelTextPrompter(
             env=self.env,
+            epoch_id=epoch_id,
+            data_dir=self.data_dir,
             parser=None,
             feedback_manager=self.feedback_manager,
             max_tokens=3000,
