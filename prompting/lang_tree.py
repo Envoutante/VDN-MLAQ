@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, time
 
 # Fix Windows SSL cert store corruption (affects torch/aiohttp imports)
 try:
@@ -220,6 +220,7 @@ class LangTree:
         self.q_gamma = q_gamma
         self.q_alpha = q_alpha if q_alpha is not None else 1.0 / max(1, num_agents)
         self.q_tables = [dict() for _ in range(num_agents)]   # 每 agent 一张 Q 表 {(s,i),(a,i): value}
+        self.q_time = {'total': 0.0, 'calls': 0}   # 统计"算 Q/V 值"累计耗时(秒)与次数（case 级对比用）
         if load:
             self.load(tree_path)
 
@@ -381,6 +382,7 @@ class LangTree:
         raise ValueError('Action does not exist in the tree')
 
     def compute_values(self, target_state, loop=5):
+        _t0 = time.perf_counter()  # —— 计时：算价值总耗时/次数（对比用）——
         # initial the valuse of all nodes to 0 except target state
         target_state = preprocess_state(target_state)  # 先在树中找到目标状态节点并设置 value 为 1
         state_exist = False
@@ -400,6 +402,9 @@ class LangTree:
                     temp_value = node.compute_value()  # 计算每个节点的 value 值
                     if temp_value is not None:
                         node.value = temp_value  # 更新每个节点的 value 值
+
+        self.q_time['total'] += time.perf_counter() - _t0
+        self.q_time['calls'] += 1
 
     def compute_ucb_values(self, loop=5):
         """
@@ -455,6 +460,7 @@ class LangTree:
         """遍历式 VDN（Q 值迭代）：对所有边同步更新各 agent 的 Q 值。
         奖励对齐 MLAQ 临时树 Success 语义：进入目标（成功）状态的边 r=1；
         目标/死端无出边 → max 项为 0。不清零 q_tables（warm-start）。"""
+        _t0 = time.perf_counter()  # —— 计时：算 Q 值总耗时/次数（对比用）——
         target_state = preprocess_state(target_state)
         for _ in range(loop):
             # 1) 每个状态的 max Q_tot（用当前值，同步）
@@ -488,6 +494,9 @@ class LangTree:
 
             if max_delta < tol:
                 break
+
+        self.q_time['total'] += time.perf_counter() - _t0
+        self.q_time['calls'] += 1
 
     def vdn_get_best(self, state, without_virtual=True):
         """按联合 Q_tot 选动作，返回 (action, best_child)。Q 全 0 时返回第一个非虚拟边，

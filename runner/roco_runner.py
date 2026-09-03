@@ -395,6 +395,10 @@ class LLMRunner:
 
             case_result['end_step'] = end_step
             case_result['env_replans'] = self.prompter.env_replans
+            # 本 case 的 Q/V 值计算统计（累计到 case 结束前，最后一次写入即最终值）
+            _qt = self.prompter.lang_tree.q_time
+            case_result['q_compute_time_ms'] = round(_qt['total'] * 1000, 3)
+            case_result['q_compute_calls'] = _qt['calls']
             with open(path.join(self.prompter.case_dir, "case_result.json"), "w") as f:
                 json.dump(case_result, f, indent=2)
 

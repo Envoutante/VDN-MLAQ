@@ -299,6 +299,7 @@ class DialogModelPrompter:
         self.imagination_failure = 0
         self.env_replans = 0
         self.last_end_step = 100
+        self.lang_tree.q_time = {'total': 0.0, 'calls': 0}   # 清零本 case 的"算 Q/V 值"计时
 
         # 获取永久记忆 (包含 policy 和 prediction 错误历史) 的副本 (避免在测试用例中修改永久记忆)
         self.temporary_memory = copy.deepcopy(self.memory)
