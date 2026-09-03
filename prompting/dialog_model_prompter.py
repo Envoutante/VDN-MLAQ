@@ -131,9 +131,10 @@ class DialogModelPrompter:
             load=load,
             if_temp_tree=False,
             tree_path=path.join(exp_output_dir(self.env.name, epoch_id, data_dir), 'lang_tree.pth'),
+            num_agents=len(self.robot_agent_names),
         )
 
-        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True)
+        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, num_agents=len(self.robot_agent_names))
         self.case_dir, self.simulate_save_dir, self.interact_save_dir = None, None, None
         self.round_save_dir, self.env_round_save_dir = None, None
         self.round_index = 1
@@ -150,25 +151,21 @@ class DialogModelPrompter:
     """
     def check_path_exist(self, state_desp, target_state_desp):
         """
-        判断永久树中是否存在从当前状态到目标状态的最优轨迹
+        判断永久树中是否存在从当前状态到目标状态的最优轨迹（VDN：Q_tot > 阈值）
         """
-        lang_tree = copy.deepcopy(self.lang_tree)  # 深拷贝 (避免影响永久树上的 value 值)
-
-        state_node = lang_tree.get_node(state_desp)  # 根据状态描述获取当前节点
-        target_state_desp_node = lang_tree.get_node(target_state_desp)  # 根据状态描述获取目标节点
-
-        if target_state_desp_node is None or state_node is None:
-            return False
-
-        lang_tree.compute_values(target_state=target_state_desp, loop=10)
-        return state_node.value > 0.5
+        # 原（值迭代）：
+        #   lang_tree = copy.deepcopy(self.lang_tree)  # 深拷贝 (避免影响 value)
+        #   lang_tree.compute_values(target_state=target_state_desp, loop=10)
+        #   return state_node.value > 0.5
+        self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
+        return self.lang_tree.get_max_q_tot(state_desp) > 0.5
 
     def initial_temp_lang_tree(self, state_desp, target_state_desp):
         """
         初始化临时语言树
         检查永久树中是否存在最优轨迹，若有则在临时树里添加，并计算 UCB 值
         """
-        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True)  # 创建临时语言树
+        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, num_agents=len(self.robot_agent_names))  # 创建临时语言树
 
         self.temp_lang_tree.build_virtual_node(state_desp)  # 为初始状态节点创建虚拟子节点
         self.temp_lang_tree.get_node(state_desp).visit_num += 1
@@ -178,13 +175,15 @@ class DialogModelPrompter:
         
         # 若从初始状态到目标状态存在最优轨迹，则把该轨迹复制到临时语言树上
         if path_exist:
-            self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)  # 在语言树上精确计算状态价值
+            # 原：self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)  # 值迭代
+            self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
 
             # 把永久树上的最优轨迹复制到临时树上
             reach_target = False
             while not reach_target:
                 state_node = self.lang_tree.get_node(preprocess_state(state_desp))  # 在永久树上找到初始状态对应的节点
-                action, next_state_node = state_node.get_best()  # 在永久树上根据 value 值选择最优动作
+                # 原：action, next_state_node = state_node.get_best()
+                action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
 
                 # 把 (s, a, s') 复制到临时树上
                 self.temp_lang_tree.update(transition=[state_node.state, action, next_state_node.state])  # 把 (s, a, s') 加入到临时树上
@@ -203,7 +202,8 @@ class DialogModelPrompter:
                     success_node.visit_num += 1
                     success_node.value = 1
 
-            self.temp_lang_tree.compute_ucb_values(loop=20)  # 计算临时树上每个节点的 UCB 值
+            # 原：self.temp_lang_tree.compute_ucb_values(loop=20)
+            self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp, loop=20)  # 计算临时树上每个节点的 UCB 值（VDN 版）
 
     def fill_temp_lang_tree(self, state_desp, target_state_desp):
         """
@@ -220,13 +220,15 @@ class DialogModelPrompter:
 
         # 若从当前状态到目标状态存在最优轨迹，则把该轨迹复制到临时语言树上
         if path_exist:
-            self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
+            # 原：self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
+            self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
 
             # 把永久树上的最优轨迹复制到临时树上
             reach_target = False
             while not reach_target:
                 state_node = self.lang_tree.get_node(preprocess_state(state_desp))  # 在永久树上找到当前状态对应的节点
-                action, next_state_node = state_node.get_best()  # 在永久树上根据 value 值选择最优动作
+                # 原：action, next_state_node = state_node.get_best()
+                action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
 
                 self.temp_lang_tree.update(transition=[state_node.state, action, next_state_node.state])  # 把 (s, a, s') 加入到临时树上
                 self.temp_lang_tree.build_virtual_node(next_state_node.state)  # 为 s' 创建虚拟子节点
@@ -252,7 +254,8 @@ class DialogModelPrompter:
                         success_node.visit_num += 1
                     success_node.value = 1
 
-        self.temp_lang_tree.compute_ucb_values(loop=20)
+        # 原：self.temp_lang_tree.compute_ucb_values(loop=20)
+        self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp, loop=20)
 
     """
     --------------------------------------- 语言树管理 (终) ---------------------------------------
@@ -267,12 +270,14 @@ class DialogModelPrompter:
         path_exist = self.check_path_exist(self.state_desp, target_state_desp=target_state_desp)
         end_step = 0
         if path_exist:
-            self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
+            # 原：self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
+            self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
             reach_target = False
             state_desp = self.state_desp
             while not reach_target:
                 state_node = self.lang_tree.get_node(preprocess_state(state_desp))
-                action, next_state_node = state_node.get_best()
+                # 原：action, next_state_node = state_node.get_best()
+                action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 end_step += 1
                 state_desp = next_state_node.state
 
@@ -918,11 +923,12 @@ class DialogModelPrompter:
             path_exist = self.check_path_exist(state_desp, target_state_desp=self.env.target_state_desp)
 
             if path_exist:
-                # 若存在候选最优轨迹则直接选择最优动作
-                lang_tree = copy.deepcopy(self.lang_tree)
-                lang_tree.compute_values(target_state=self.env.target_state_desp, loop=100)
-                state_node = lang_tree.get_node(state_desp)
-                action, _ = state_node.get_best()
+                # 若存在候选最优轨迹则直接选择最优动作（VDN：按 Q_tot = Σ Q_i 选）
+                # 原：lang_tree = copy.deepcopy(self.lang_tree)
+                #     lang_tree.compute_values(target_state=self.env.target_state_desp, loop=100)
+                #     action, _ = lang_tree.get_node(state_desp).get_best()
+                self.lang_tree.vdn_compute_q_values(self.env.target_state_desp, loop=20)
+                action, _ = self.lang_tree.vdn_get_best(state_desp)
             else:
                 # 若不存在候选最优轨迹
                 if self.get_imagine_flag(state_desp):

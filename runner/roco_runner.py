@@ -422,7 +422,7 @@ class LLMRunner:
         json.dump(args_dict, open(fname, "w"), indent=2)  # 写入参数
 
         start_case_id = args.start_case_id  # case_id = 0, 1, 2, ...
-        total_test_number = min(self.env.case_number, 30)  # 限制本次运行需要测试的用例个数
+        total_test_number = min(self.env.case_number, start_case_id + args.num_cases)  # 限制本次运行需要测试的用例个数
 
         # 循环完成每个测试用例
         for case_id in range(start_case_id, total_test_number):

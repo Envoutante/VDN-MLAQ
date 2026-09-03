@@ -188,6 +188,7 @@ if __name__ == "__main__":
     parser.add_argument("--task", type=str, default="sandwich_dialog")  # "sandwich_dialog", "sort_dialog", "sandwich_central", "sort_central", "blocksworld"
     parser.add_argument("--start_run_id", "-sri", type=int, default=0)
     parser.add_argument("--start_case_id", "-sci", type=int, default=0)
+    parser.add_argument("--num_cases", type=int, default=30, help="本次最多跑几个 case（从 start_case_id 起），测试用可设小值")
     parser.add_argument("--tree_load", "-tl", action="store_true")
     parser.add_argument("--llm_source", "-llm", type=str, default="gpt-4-0125-preview")
     # optimal steps for different domains

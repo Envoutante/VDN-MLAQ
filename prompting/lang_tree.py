@@ -210,10 +210,16 @@ class Nodes:
 
 
 class LangTree:
-    def __init__(self, load=False, if_temp_tree=False, tree_path='data/lang_tree.pth'):
+    def __init__(self, load=False, if_temp_tree=False, tree_path='data/lang_tree.pth',
+                num_agents=1, q_alpha=None, q_gamma=0.995):
         self.nodes = []
         self.if_temp_tree = if_temp_tree
         self.tree_path = tree_path
+        # —— VDN：per-agent Q 表（对称投影 o_i=(s,i)、a_i=(a,i)）——
+        self.num_agents = num_agents
+        self.q_gamma = q_gamma
+        self.q_alpha = q_alpha if q_alpha is not None else 1.0 / max(1, num_agents)
+        self.q_tables = [dict() for _ in range(num_agents)]   # 每 agent 一张 Q 表 {(s,i),(a,i): value}
         if load:
             self.load(tree_path)
 
@@ -425,6 +431,93 @@ class LangTree:
                     child_node.ucb_value = child_node.value / child_node.visit_num + 2 * np.sqrt(
                                             np.log(total_num) / child_node.visit_num)
                     # node.ucb_value = node.value / node.visit_num + 2 * np.sqrt(np.log(node.visit_num) / node.visit_num)
+
+    # ==================== VDN（对称投影 + 遍历式 Q 值迭代）====================
+    def get_q(self, i, s, a):
+        """agent i 在 (局部观测 s, 局部动作 a) 上的 Q 值（对称投影 o_i=(s,i)、a_i=(a,i)）。
+        s / a 需为已 preprocess 的状态/动作文本（node.state / child['action']）。"""
+        return self.q_tables[i].get(((s, i), (a, i)), 0.0)
+
+    def get_q_tot(self, s, a):
+        """联合 Q = Σ_i Q_i。"""
+        return sum(self.get_q(i, s, a) for i in range(self.num_agents))
+
+    def get_max_q_tot(self, state):
+        """该状态所有出边的最大 Q_tot；无出边 / 状态不在树里返回 0。"""
+        state_node = self.get_node(state)
+        if state_node is None:
+            return 0.0
+        vals = [self.get_q_tot(state_node.state, child['action'])
+                for child in state_node.children if child['action'] != 'action_virtual']
+        return max(vals) if vals else 0.0
+
+    def vdn_compute_q_values(self, target_state, loop=20, tol=1e-6):
+        """遍历式 VDN（Q 值迭代）：对所有边同步更新各 agent 的 Q 值。
+        奖励对齐 MLAQ 临时树 Success 语义：进入目标（成功）状态的边 r=1；
+        目标/死端无出边 → max 项为 0。不清零 q_tables（warm-start）。"""
+        target_state = preprocess_state(target_state)
+        for _ in range(loop):
+            # 1) 每个状态的 max Q_tot（用当前值，同步）
+            maxq = {}
+            for node in self.nodes:
+                vals = [self.get_q_tot(node.state, child['action'])
+                        for child in node.children if child['action'] != 'action_virtual']
+                maxq[node.state] = max(vals) if vals else 0.0
+
+            # 2) 每条边算 delta（暂存，不就地改）
+            updates = []
+            for node in self.nodes:
+                s = node.state
+                for child in node.children:
+                    a = child['action']
+                    if a == 'action_virtual':
+                        continue
+                    s_next = child['child'].state
+                    r = 1.0 if s_next == target_state else 0.0
+                    d = 1.0 if s_next == target_state else 0.0
+                    tgt = r + self.q_gamma * (1 - d) * maxq.get(s_next, 0.0)
+                    updates.append((s, a, tgt - self.get_q_tot(s, a)))
+
+            # 3) 同步写回各 agent
+            max_delta = 0.0
+            for s, a, delta in updates:
+                max_delta = max(max_delta, abs(delta))
+                for i in range(self.num_agents):
+                    key = ((s, i), (a, i))
+                    self.q_tables[i][key] = self.q_tables[i].get(key, 0.0) + self.q_alpha * delta
+
+            if max_delta < tol:
+                break
+
+    def vdn_get_best(self, state, without_virtual=True):
+        """按联合 Q_tot 选动作，返回 (action, best_child)。Q 全 0 时返回第一个非虚拟边，
+        与 MLAQ get_best 对全 0 value 的行为一致。"""
+        state_node = self.get_node(state)
+        if state_node is None:
+            return None, None
+        best_action, best_child, best_value = None, None, float('-inf')
+        for child in state_node.children:
+            action = child['action']
+            if without_virtual and action == 'action_virtual':
+                continue
+            q = self.get_q_tot(state_node.state, action)
+            if q > best_value:
+                best_value, best_action, best_child = q, action, child['child']
+        return best_action, best_child
+
+    def vdn_compute_ucb_values(self, target_state, loop=5):
+        """想象阶段 UCB：先对整树跑 vdn_compute_q_values，再用边 Q_tot 算 UCB。
+        （VDN 版 compute_ucb_values；原值迭代版保留供对照）"""
+        self.vdn_compute_q_values(target_state, loop=loop)
+        for node in self.nodes:
+            if node.num_children == 0:
+                continue
+            total_num = sum(max(1, child['child'].visit_num) for child in node.children)
+            for child in node.children:
+                child_node = child['child']
+                visit = max(1, child_node.visit_num)
+                q = self.get_q_tot(node.state, child['action'])
+                child_node.ucb_value = q / visit + 2 * np.sqrt(np.log(max(1, total_num)) / visit)
 
     def if_same(self, state, target_state):
         state = preprocess_state(state)

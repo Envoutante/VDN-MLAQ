@@ -2,6 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "VDN-MLAQ: sort_dialog_run0_opt3",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_MLAQ.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--task", "sort_dialog",
+                "--algo", "vdn-mlaq",
+                "--llm_source", "deepseek-v4-flash",
+                "--tsteps", "8",
+                "--optimal_steps", "3",
+                "--start_run_id", "0",
+                "--start_case_id", "0",
+                "--num_runs", "1",
+                "--skip_display",
+                "--tree_load"
+            ]
+        },
+        {
             "name": "MLAQ: sort_dialog",
             "type": "debugpy",
             "request": "launch",
