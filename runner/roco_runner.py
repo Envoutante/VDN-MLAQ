@@ -57,7 +57,8 @@ class LLMRunner:
             temperature: float = 0.0,
             llm_source: str = "gpt4",
             tree_load: bool = False,
-            skip_check_memory: bool = False
+            skip_check_memory: bool = False,
+            algo: str = "mlaq"      # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN
     ):
         self.env = env
         self.env.reset()
@@ -65,6 +66,7 @@ class LLMRunner:
         self.robot_agent_names = list(robots.keys())  # ['Alice', etc.]
         self.data_dir = data_dir
         self.run_name = run_name
+        self.algo = algo   # 透传给 prompter：mlaq / vdn
 
         # NOTE: the run directory is data/env_name, or data/env_name/<epoch_id> (epoch_id = "<算法>/<YYYYMMDD_HHMM>")
         run_dir = exp_output_dir(self.env.name, epoch_id, self.data_dir)
@@ -140,7 +142,8 @@ class LLMRunner:
                 temperature=self.temperature,
                 llm_source=llm_source,
                 load=self.tree_load,
-                skip_check_memory=skip_check_memory
+                skip_check_memory=skip_check_memory,
+                algo=self.algo
             )
         else:
             self.prompter = ModelPrompter(

@@ -141,6 +141,7 @@ def main(args):
             llm_source=args.llm_source,
             tree_load=args.tree_load,
             skip_check_memory=args.skip_check_memory,
+            algo=args.algo,   # algo 名选择：mlaq=值迭代 / vdn-mlaq=遍历式 VDN
         )
 
         # 运行 runner
