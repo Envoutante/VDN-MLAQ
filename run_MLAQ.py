@@ -88,6 +88,7 @@ def _setup_llm_api(llm_source):
         )
     os.environ["OPENAI_API_KEY"] = api_key
     os.environ["OPENAI_API_BASE"] = api_base
+    os.environ["LLM_API_KEY"] = api_key      # 供 tools/minimax_quota 查 Token Plan 余量
     openai.api_base = api_base
     openai.api_key = api_key
 

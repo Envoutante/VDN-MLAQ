@@ -1,5 +1,6 @@
 import copy
 import os
+import sys
 import json
 import random
 import pickle
@@ -13,6 +14,7 @@ from typing import List, Tuple, Dict, Union, Optional, Any
 from rocobench import PlannedPathPolicy, LLMPathPlan, MultiArmRRT
 from prompting import LLMResponseParser, FeedbackManager, ModelPrompter
 from prompting.paths import exp_output_dir
+from tools.minimax_quota import LLMQuotaExceeded
 from rocobench.envs import SortOneBlockTask, MakeSandwichTask, MujocoSimEnv, SimRobot, visualize_voxel_scene
 from rocobench.dialog_envs import SortOneBlockTask as SortOneBlockDialogTask
 from rocobench.dialog_envs import MakeSandwichTask as MakeSandwichDialogTask
@@ -448,5 +450,15 @@ class LLMRunner:
             print(f"============ Case {case_id} starts ============")
             self.episode_id = 0
             self.prompter.case_reset()
-            self.one_run_with_model(case_id)
+            try:
+                self.one_run_with_model(case_id)
+            except LLMQuotaExceeded as qe:
+                # 配额无法靠等待区间重置恢复（如周额度耗尽）→ 打印续跑命令并干净退出
+                rel = os.path.relpath(self.run_dir, self.data_dir).replace(os.sep, '/')
+                epoch = '/'.join(rel.split('/')[1:])   # <algo>/<YYYYMMDD_HHMM>
+                print(f"\n[quota] {qe}")
+                print(f"本批次输出目录: {self.run_dir}")
+                print("额度恢复后用以下命令续跑（断点恢复，已完成的 case 不会重跑）：")
+                print(f"    python run_benchmark.py --epoch {epoch}")
+                sys.exit(1)
             print(f"============ Case {case_id} ends ============\n\n")

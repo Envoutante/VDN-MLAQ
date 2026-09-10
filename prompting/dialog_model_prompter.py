@@ -12,6 +12,7 @@ from datetime import datetime
 
 from prompting.lang_tree import LangTree, preprocess_state, preprocess_action
 from prompting.paths import exp_output_dir
+from tools.minimax_quota import handle_api_error
 from rocobench.envs import EnvState
 
 # assert os.path.exists("openai_key.json"), "Please put your OpenAI API key in a string in robot-collab/openai_key.json"
@@ -703,8 +704,8 @@ class DialogModelPrompter:
                             if chunk['choices'][0]['delta'].get('content') is not None:
                                 response += chunk['choices'][0]['delta']['content']
                     break
-                except:
-                    print("API error, try again")
+                except Exception as e:
+                    handle_api_error(e)
                     continue
         else:
             response, usage = None, None
@@ -719,8 +720,8 @@ class DialogModelPrompter:
                     response = resp['choices'][0]['message']["content"]
                     usage = resp['usage'] if 'usage' in resp else None
                     break
-                except:
-                    print("API error, try again")
+                except Exception as e:
+                    handle_api_error(e)
                 continue
 
         # token 统计：优先 API 真实 usage，缺失则回退 tiktoken 估算
