@@ -757,19 +757,23 @@ This previous [Action] failed to parse!: '{action}'
             ]
             input_str = prompt['system_prompt'] + prompt['user_prompt']
 
-        input_token = len(self.token_encoder.encode(input_str))
+        est_input_token = len(self.token_encoder.encode(input_str))  # API 未返回 usage 时的估算兜底
 
         start_time = time.time()
+        usage = None
         if use_stream:
             for _ in range(max_query):
-                response = ''
+                response, usage = '', None
                 try:
                     stream = openai.ChatCompletion.create(
                         model=self.llm_source,
                         messages=messages,
                         temperature=0.0,
-                        stream=True)
+                        stream=True,
+                        stream_options={'include_usage': True})  # 让流式也返回真实 usage
                     for chunk in stream:
+                        if 'usage' in chunk and chunk['usage']:
+                            usage = chunk['usage']  # 末个 choices 为空的 chunk 携带 usage
                         if len(chunk['choices']) > 0:
                             if chunk['choices'][0]['delta'].get('content') is not None:
                                 response += chunk['choices'][0]['delta']['content']
@@ -778,22 +782,29 @@ This previous [Action] failed to parse!: '{action}'
                     print("API error, try again")
                     continue
         else:
-            response = None
+            response, usage = None, None
             for _ in range(max_query):
                 try:
-                    response = openai.ChatCompletion.create(
+                    resp = openai.ChatCompletion.create(
                         model=self.llm_source,
                         messages=messages,
                         max_tokens=self.max_tokens,
                         temperature=self.temperature,
                     )
-                    response = response['choices'][0]['message']["content"]
+                    response = resp['choices'][0]['message']["content"]
+                    usage = resp['usage'] if 'usage' in resp else None
                     break
                 except:
                     print("API error, try again")
                 continue
 
-        output_token = len(self.token_encoder.encode(response))
+        # token 统计：优先 API 真实 usage，缺失则回退 tiktoken 估算
+        if usage:
+            input_token = usage.get('prompt_tokens', est_input_token)
+            output_token = usage.get('completion_tokens', len(self.token_encoder.encode(response)))
+        else:
+            input_token = est_input_token
+            output_token = len(self.token_encoder.encode(response))
 
         end_time = time.time()
         print("Time elapsed: {:.2f}".format(end_time - start_time))
