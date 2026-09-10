@@ -1089,7 +1089,11 @@ class DialogModelPrompter:
                 """
                 state_node = self.temp_lang_tree.get_node(state_desp)  # 在临时树上找到当前状态节点
                 assert state_node is not None, f"state_node is None, state_desp:{state_desp}"
-                action, best_child = state_node.get_best(with_ucb=True)  # 通过 UCB 选择最优动作和对应的子节点
+                if self.algo == 'vdn-mlaq':
+                    # with_ucb=True；不排除 virtual（想象需要可能选中 virtual 来调 LLM）
+                    action, best_child = self.temp_lang_tree.vdn_get_best(state_desp, with_ucb=True, without_virtual=False)
+                else:
+                    action, best_child = state_node.get_best(with_ucb=True)  # 通过 UCB 选择最优动作和对应的子节点
 
                 if action == 'action_virtual':
                     # 若选到虚拟子节点
@@ -1123,7 +1127,10 @@ class DialogModelPrompter:
                         failed = True
                     elif imagine_info == 'exhausted':
                         # 若 LLM 想象力耗尽，则根据 UCB 值从已知动作中选择最优动作 (排除掉了虚拟子节点)
-                        action, best_child = state_node.get_best(with_ucb=True, without_virtual=True)
+                        if self.algo == 'vdn-mlaq':
+                            action, best_child = self.temp_lang_tree.vdn_get_best(state_desp, with_ucb=True, without_virtual=True)
+                        else:
+                            action, best_child = state_node.get_best(with_ucb=True, without_virtual=True)
                         action_history.append(action)
                         assert best_child is not None, f"child is None, action: {action}"
                         next_state_desp = best_child.state

@@ -138,32 +138,6 @@ class Nodes:
 
         return None
 
-    def compute_distance(self, target_state):
-        pass
-
-    def get_best(self, with_ucb=False, without_virtual=False):
-        """
-        获取价值最大的动作及其对应的子节点
-        """
-        values = {}
-        for child in self.children:
-            if with_ucb:
-                assert hasattr(child['child'], 'ucb_value'), 'The child node does not have ucb_value attribute'
-                values[child['action']] = child['child'].ucb_value
-            else:
-                values[child['action']] = child['child'].value
-
-        if without_virtual:
-            values.pop('action_virtual')
-
-        best_action = max(values, key=values.get)
-        for child in self.children:
-            if child['action'] == best_action:
-                best_child = child['child']
-                break
-
-        return best_action, best_child
-
     def get_children_actions(self, without_virtual=False):
         """
         获取当前节点所有已记录过的动作
@@ -208,6 +182,29 @@ class Nodes:
 
                 return value
 
+    def get_best(self, with_ucb=False, without_virtual=False):
+        """
+        获取价值最大的动作及其对应的子节点
+        """
+        values = {}
+        for child in self.children:
+            if with_ucb:
+                assert hasattr(child['child'], 'ucb_value'), 'The child node does not have ucb_value attribute'
+                values[child['action']] = child['child'].ucb_value
+            else:
+                values[child['action']] = child['child'].value
+
+        if without_virtual:
+            values.pop('action_virtual')
+
+        best_action = max(values, key=values.get)
+        for child in self.children:
+            if child['action'] == best_action:
+                best_child = child['child']
+                break
+
+        return best_action, best_child
+
 
 class LangTree:
     def __init__(self, load=False, if_temp_tree=False, tree_path='data/lang_tree.pth',
@@ -238,15 +235,6 @@ class LangTree:
                     print(f'Node {child["child"].state} added to the tree')
 
         self.save()
-
-    def init_values(self):
-        """
-        初始化各个节点的统计数值
-        """
-        for node in self.nodes:
-            node.value = 0
-            node.ucb_value = 0
-            node.visit_num = 0
 
     def save(self):
         torch.save(self, self.tree_path)
@@ -457,20 +445,20 @@ class LangTree:
         return max(vals) if vals else 0.0
 
     def vdn_compute_q_values(self, target_state, loop=20, tol=1e-6):
-        """遍历式 VDN（Q 值迭代）：对所有边同步更新各 agent 的 Q 值。
-        奖励对齐 MLAQ 临时树 Success 语义：进入目标（成功）状态的边 r=1；
-        目标/死端无出边 → max 项为 0。不清零 q_tables（warm-start）。"""
+        """
+        遍历式 VDN 计算 Q_i
+        """
         _t0 = time.perf_counter()  # —— 计时：算 Q 值总耗时/次数（对比用）——
         target_state = preprocess_state(target_state)
         for _ in range(loop):
-            # 1) 每个状态的 max Q_tot（用当前值，同步）
+            # 1) 计算每个节点的 max Q_tot
             maxq = {}
             for node in self.nodes:
                 vals = [self.get_q_tot(node.state, child['action'])
                         for child in node.children if child['action'] != 'action_virtual']
                 maxq[node.state] = max(vals) if vals else 0.0
 
-            # 2) 每条边算 delta（暂存，不就地改）
+            # 2) 计算每条边的 delta
             updates = []
             for node in self.nodes:
                 s = node.state
@@ -484,7 +472,7 @@ class LangTree:
                     tgt = r + self.q_gamma * (1 - d) * maxq.get(s_next, 0.0)
                     updates.append((s, a, tgt - self.get_q_tot(s, a)))
 
-            # 3) 同步写回各 agent
+            # 3) 同步写回各个 agent 的 Q_i 表
             max_delta = 0.0
             for s, a, delta in updates:
                 max_delta = max(max_delta, abs(delta))
@@ -498,35 +486,57 @@ class LangTree:
         self.q_time['total'] += time.perf_counter() - _t0
         self.q_time['calls'] += 1
 
-    def vdn_get_best(self, state, without_virtual=True):
-        """按联合 Q_tot 选动作，返回 (action, best_child)。Q 全 0 时返回第一个非虚拟边，
-        与 MLAQ get_best 对全 0 value 的行为一致。"""
-        state_node = self.get_node(state)
-        if state_node is None:
-            return None, None
-        best_action, best_child, best_value = None, None, float('-inf')
-        for child in state_node.children:
-            action = child['action']
-            if without_virtual and action == 'action_virtual':
-                continue
-            q = self.get_q_tot(state_node.state, action)
-            if q > best_value:
-                best_value, best_action, best_child = q, action, child['child']
-        return best_action, best_child
-
     def vdn_compute_ucb_values(self, target_state, loop=5):
-        """想象阶段 UCB：先对整树跑 vdn_compute_q_values，再用边 Q_tot 算 UCB。
-        （VDN 版 compute_ucb_values；原值迭代版保留供对照）"""
+        """
+        计算 UCB 值
+        """
+        # 计算 Q_i 值
         self.vdn_compute_q_values(target_state, loop=loop)
+
+        # 计算 UCB 值
         for node in self.nodes:
             if node.num_children == 0:
                 continue
+
             total_num = sum(max(1, child['child'].visit_num) for child in node.children)
             for child in node.children:
                 child_node = child['child']
                 visit = max(1, child_node.visit_num)
+
+                # 计算 Q_tot 值
                 q = self.get_q_tot(node.state, child['action'])
+
                 child_node.ucb_value = q / visit + 2 * np.sqrt(np.log(max(1, total_num)) / visit)
+
+    def vdn_get_best(self, state, with_ucb=False, without_virtual=True):
+        """
+        选择最优动作
+        with_ucb=False  按照 Q_tot 选择最优动作
+        with_ucb=True   按照 ucb_value 选择最优动作
+        """
+        state_node = self.get_node(state)
+        if state_node is None:
+            return None, None
+
+        best_action, best_child, best_score = None, None, float('-inf')
+        for child in state_node.children:
+            action = child['action']
+
+            # without_virtual 参数指明是否需要排除虚拟动作
+            if without_virtual and action == 'action_virtual':
+                continue
+
+            if with_ucb:
+                # 根据 UCB 值选择最优动作 —— LLM 想象阶段
+                sc = getattr(child['child'], 'ucb_value', float('-inf'))
+            else:
+                # 根据 Q_tot 值选择最优动作 —— 环境交互阶段
+                sc = self.get_q_tot(state_node.state, action)
+
+            if sc > best_score:
+                best_score, best_action, best_child = sc, action, child['child']
+
+        return best_action, best_child
 
     def if_same(self, state, target_state):
         state = preprocess_state(state)
