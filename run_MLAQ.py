@@ -57,22 +57,43 @@ def _load_env_file(env_path=".env"):
 
 
 _env = _load_env_file()
-Your_OpenAI_API_KEY = _env.get("DEEPSEEK_API_KEY", "")
-Your_OpenAI_API_BASE = _env.get("DEEPSEEK_API_BASE", "https://api.deepseek.com")
-if not Your_OpenAI_API_KEY:
-    raise RuntimeError(
-        "未在 .env 中找到 DEEPSEEK_API_KEY。请在项目根目录创建 .env 并写入："
-        "DEEPSEEK_API_KEY=sk-xxxx（.env 不会提交到 git）"
-    )
 
-OPENAI_KEY = str(Your_OpenAI_API_KEY)
-os.environ["OPENAI_API_KEY"] = OPENAI_KEY
-os.environ["OPENAI_API_BASE"] = Your_OpenAI_API_BASE
-openai.api_base = Your_OpenAI_API_BASE
-openai.api_key = OPENAI_KEY
+# 按 --llm_source 选择对应的 .env 字段：(key 字段, base 字段, 默认 base)
+# 与各 prompter 的 assert 白名单保持一致；未登记的模型直接报错。
+_LLM_ENV_FIELDS = {
+    "deepseek-v4-flash":  ("DEEPSEEK_API_KEY", "DEEPSEEK_API_BASE", "https://api.deepseek.com"),
+    "deepseek-v4-pro":    ("DEEPSEEK_API_KEY", "DEEPSEEK_API_BASE", "https://api.deepseek.com"),
+    "MiniMax-M3":         ("MINIMAX_API_KEY",  "MINIMAX_API_BASE",  "https://api.minimax.cn/v1"),
+    "gpt-4":              ("OPENAI_API_KEY",   "OPENAI_API_BASE",   "https://api.openai.com/v1"),
+    "gpt-3.5-turbo":      ("OPENAI_API_KEY",   "OPENAI_API_BASE",   "https://api.openai.com/v1"),
+    "gpt-4-1106-preview": ("OPENAI_API_KEY",   "OPENAI_API_BASE",   "https://api.openai.com/v1"),
+    "gpt-4-0125-preview": ("OPENAI_API_KEY",   "OPENAI_API_BASE",   "https://api.openai.com/v1"),
+    "claude":             ("OPENAI_API_KEY",   "OPENAI_API_BASE",   "https://api.openai.com/v1"),
+}
+
+
+def _setup_llm_api(llm_source):
+    """按模型名从 .env 读取对应的 API key/base，并写入 openai 全局配置。"""
+    if llm_source not in _LLM_ENV_FIELDS:
+        raise RuntimeError(
+            f"未知模型 {llm_source}：请在 run_MLAQ.py 的 _LLM_ENV_FIELDS 中登记其 key/base 字段"
+        )
+    key_field, base_field, default_base = _LLM_ENV_FIELDS[llm_source]
+    api_key = _env.get(key_field, "")
+    api_base = _env.get(base_field, default_base)
+    if not api_key:
+        raise RuntimeError(
+            f"未在 .env 中找到 {key_field}（模型 {llm_source} 对应）。请在项目根目录 .env 中写入："
+            f"{key_field}=sk-xxxx 与 {base_field}={default_base}（.env 不会提交到 git）"
+        )
+    os.environ["OPENAI_API_KEY"] = api_key
+    os.environ["OPENAI_API_BASE"] = api_base
+    openai.api_base = api_base
+    openai.api_key = api_key
 
 
 def main(args):
+    _setup_llm_api(args.llm_source)   # 按 --llm_source 载入对应模型的 key/base
     # 本次实验的输出标识: <算法>/<YYYYMMDD_HHMM>，落到 data/<task>/<epoch_id> 下
     # 每次启动自动追加分钟时间戳，避免不同算法/批次互相覆盖。
     # 若显式传 --epoch（如 run_benchmark 多阶段续跑要固定同一批次），则原样使用

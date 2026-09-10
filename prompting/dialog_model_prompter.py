@@ -145,8 +145,8 @@ class DialogModelPrompter:
         self.imagination_failure = 0
         self.env_replans = 0
 
-        assert llm_source in ["gpt-4", "gpt-3.5-turbo", 'gpt-4-1106-preview', 'gpt-4-0125-preview',  "claude", "deepseek-v4-flash", "deepseek-v4-pro"], \
-            f"llm_source must be one of [gpt4, gpt-3.5-turbo, gpt-4-1106-preview, gpt-4-0125-preview, claude, deepseek-v4-flash, deepseek-v4-pro], got {llm_source}"
+        assert llm_source in ["gpt-4", "gpt-3.5-turbo", 'gpt-4-1106-preview', 'gpt-4-0125-preview',  "claude", "deepseek-v4-flash", "deepseek-v4-pro", "MiniMax-M3"], \
+            f"llm_source must be one of [gpt4, gpt-3.5-turbo, gpt-4-1106-preview, gpt-4-0125-preview, claude, deepseek-v4-flash, deepseek-v4-pro, MiniMax-M3], got {llm_source}"
 
     """
     --------------------------------------- 语言树管理 (起) ---------------------------------------

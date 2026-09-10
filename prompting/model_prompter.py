@@ -114,8 +114,8 @@ class ModelPrompter:
         self.interaction_failure = 0
         self.imagination_failure = 0
 
-        assert llm_source in ["gpt-4", "gpt-3.5-turbo", 'gpt-4-1106-preview', 'gpt-4-0125-preview',  "claude", "deepseek-v4-flash", "deepseek-v4-pro"], \
-            f"llm_source must be one of [gpt4, gpt-3.5-turbo, gpt-4-1106-preview, gpt-4-0125-preview, claude, deepseek-v4-flash, deepseek-v4-pro], got {llm_source}"
+        assert llm_source in ["gpt-4", "gpt-3.5-turbo", 'gpt-4-1106-preview', 'gpt-4-0125-preview',  "claude", "deepseek-v4-flash", "deepseek-v4-pro", "MiniMax-M3"], \
+            f"llm_source must be one of [gpt4, gpt-3.5-turbo, gpt-4-1106-preview, gpt-4-0125-preview, claude, deepseek-v4-flash, deepseek-v4-pro, MiniMax-M3], got {llm_source}"
 
     def initial_temp_lang_tree(self, state_desp, target_state_desp):
         # initial_obs is the initial observation of the current testing case or the last failed observation
