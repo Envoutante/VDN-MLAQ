@@ -669,8 +669,10 @@ class DialogModelPrompter:
         LLM 调用接口
         """
         if type(prompt) == str:
+            # 注：MiniMax 等厂商要求 messages 里至少有一条 user 消息，
+            # 只发 system 会报 "chat content is empty (2013)"；故 str 提示词按 user 发送
             messages = [
-                {"role": "system", "content": prompt},
+                {"role": "user", "content": prompt},
             ]
             input_str = prompt
         else:
@@ -1082,7 +1084,7 @@ class DialogModelPrompter:
             self.temp_lang_tree.get_node(state_desp).visit_num += 1
             # 从初始状态开始探索直至到达目标状态 或 LLM 调用达到最大次数上限
             while not final and llm_count < horizon:
-                self.log('---------- Time step {} ----------'.format(t+1))
+                self.log('---------- Time step {} ----------'.format(t))
 
                 """
                 --------------------------------------- 想象 transition (根据 s 预测 a 和 s') ---------------------------------------
@@ -1156,7 +1158,7 @@ class DialogModelPrompter:
                 """
                 if final:
                     # (后续) 终止内循环
-                    self.log(f"Imagination step {t+1}:\n{action}\n{next_state_desp}")
+                    self.log(f"Imagination step {t}:\n{action}\n{next_state_desp}")
                     self.log(f"Imagination reaches the target state:\n{target_state_desp}")
                     self.temp_lang_tree.update(transition=[next_state_desp, 'nothing', 'Success'])
                     self.temp_lang_tree.get_node(next_state_desp).visit_num += 1
@@ -1178,7 +1180,7 @@ class DialogModelPrompter:
                 else:
                     # 正常完成 LLM 想象 transition
                     # (后续) 指针移动到下一状态
-                    self.log(f"Imagination step {t+1}:\n{action}\n{next_state_desp}")  # 打印本轮想象的动作 a 和下一状态 s'
+                    self.log(f"Imagination step {t}:\n{action}\n{next_state_desp}")  # 打印本轮想象的动作 a 和下一状态 s'
                     state_desp = next_state_desp  # 指针移动到下一状态 s'
                     self.temp_lang_tree.get_node(next_state_desp).visit_num += 1  # 下一状态 s' 的访问次数 + 1
                     t += 1

@@ -763,8 +763,9 @@ This previous [Action] failed to parse!: '{action}'
 
     def new_query_once(self, prompt, max_query=10, use_stream=False, info=None):
         if type(prompt) == str:
+            # MiniMax 等厂商要求至少一条 user 消息，只发 system 会报 "chat content is empty"
             messages = [
-                {"role": "system", "content": prompt},
+                {"role": "user", "content": prompt},
             ]
             input_str = prompt
         else:
@@ -866,7 +867,7 @@ This previous [Action] failed to parse!: '{action}'
             self.log('Original state:\n' + state_desp)
             state_desp = state_desp
             while (final is False) and (llm_count < horizon):
-                self.log('---------- Time step {} ----------'.format(t+1))
+                self.log('---------- Time step {} ----------'.format(t))
                 # get the best child and its action for the current state node
                 state_node = self.temp_lang_tree.get_node(state_desp)
                 assert state_node is not None, f"state_node is None, state_desp:{state_desp}"
@@ -930,7 +931,7 @@ This previous [Action] failed to parse!: '{action}'
                 if final or failed or restart:
                     if final:
                         # if the imagination reaches the target state
-                        self.log(f"Imagination step {t+1}:\n{action}\n{next_state_desp}")
+                        self.log(f"Imagination step {t}:\n{action}\n{next_state_desp}")
                         self.log(f"Imagination reaches the target state:\n{target_state}")
                         self.temp_lang_tree.update(transition=[next_state_desp, 'nothing', 'Success'])
                         self.temp_lang_tree.get_node(next_state_desp).visit_num += 1
@@ -956,7 +957,7 @@ This previous [Action] failed to parse!: '{action}'
                     self.log('-------------- End {}th round imagination --------------\n'.format(self.round_index))
                     break
                 else:
-                    self.log(f"Imagination step {t+1}:\n{action}\n{next_state_desp}")
+                    self.log(f"Imagination step {t}:\n{action}\n{next_state_desp}")
                     state_desp = next_state_desp
                     self.temp_lang_tree.get_node(next_state_desp).visit_num += 1
                     t += 1
