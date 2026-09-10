@@ -19,6 +19,7 @@ import sys
 import os
 import shutil
 import re
+import json
 from datetime import datetime
 
 # ---------- 默认配置 ----------
@@ -33,9 +34,9 @@ MAX_OPTIMAL_STEPS = 6
 
 def _find_resume_point(data_root: str):
     """
-    扫描 data_root 下的 run_{id} 目录，找到最大的 run_id 中已完成的最大 case_id。
+    扫描 data_root 下的 run_{id} 目录，找到最大的 run_id 中"最早的未完成 case"。
     返回 (resume_run_id, resume_case_id, restored_tree)。
-    若无任何已完成的 case，返回 (0, 0, False)。
+    若无任何 case 目录，返回 (0, 0, False)。
     """
     resume_run_id = 0
     resume_case_id = 0
@@ -57,27 +58,38 @@ def _find_resume_point(data_root: str):
     max_run = max(run_dirs)
     run_dir = os.path.join(data_root, f"run_{max_run}")
 
-    # 找出该 run 下所有有 case_result.json 的 case 目录
-    max_case = -1
+    # 判定每个 case 是否"正常收尾"（case_result.json 内含 finished: true）
+    # 注：case_result.json 每个 round 都会写，只靠"文件存在"会把中途中断的 case
+    # 误判为已完成；故以 finished 标记为准。
+    finished, unfinished = set(), set()
     for entry in os.listdir(run_dir):
         m = re.match(r"case_(\d+)$", entry)
-        if not m:
+        if not m or not os.path.isdir(os.path.join(run_dir, entry)):
             continue
         case_id = int(m.group(1))
+        ok = False
         result_path = os.path.join(run_dir, entry, "case_result.json")
-        if os.path.isfile(result_path) and case_id > max_case:
-            max_case = case_id
+        if os.path.isfile(result_path):
+            try:
+                with open(result_path, encoding="utf-8") as f:
+                    ok = json.load(f).get("finished") is True
+            except (OSError, ValueError):
+                ok = False
+        (finished if ok else unfinished).add(case_id)
 
-    if max_case >= 0:
-        resume_run_id = max_run
-        resume_case_id = max_case + 1
+    if not finished and not unfinished:
+        return resume_run_id, resume_case_id, restored_tree
 
-        # 从该 case 恢复 lang_tree 到共享路径
-        case_tree = os.path.join(run_dir, f"case_{max_case}", "lang_tree.pth")
-        shared_tree = os.path.join(data_root, "lang_tree.pth")
-        if os.path.isfile(case_tree):
-            shutil.copy(case_tree, shared_tree)
-            restored_tree = True
+    resume_run_id = max_run
+    # 从"最早的未完成 case"续跑（避免跳过被中断的 case）；全部完成则从最大已完成 +1
+    resume_case_id = min(unfinished) if unfinished else max(finished) + 1
+
+    # 恢复 lang_tree：取"续跑点前一个 case"的快照（即进入该 case 时的树状态）
+    shared_tree = os.path.join(data_root, "lang_tree.pth")
+    prev_tree = os.path.join(run_dir, f"case_{resume_case_id - 1}", "lang_tree.pth")
+    if resume_case_id > 0 and os.path.isfile(prev_tree):
+        shutil.copy(prev_tree, shared_tree)
+        restored_tree = True
 
     return resume_run_id, resume_case_id, restored_tree
 

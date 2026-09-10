@@ -412,6 +412,13 @@ class LLMRunner:
                 path.join(self.prompter.case_dir, "lang_tree.pth")
             )
 
+        # —— case 正常收尾：写 finished 标记 ——
+        # case_result.json 在循环内每轮都会写，故用 finished 区分"跑完"与"中途中断"，
+        # 供 run_benchmark 断点续跑只认已完成的 case。
+        case_result['finished'] = True
+        with open(path.join(self.prompter.case_dir, "case_result.json"), "w") as f:
+            json.dump(case_result, f, indent=2)
+
     def run(self, args):
         # 创建输出目录
         start_id = args.start_run_id  # run_id = 0, 1, 2, ...
