@@ -508,7 +508,7 @@ class LangTree:
 
                 child_node.ucb_value = q / visit + 2 * np.sqrt(np.log(max(1, total_num)) / visit)
 
-    def vdn_get_best(self, state, with_ucb=False, without_virtual=True):
+    def vdn_get_best(self, state, with_ucb=False, without_virtual=False):
         """
         选择最优动作
         with_ucb=False  按照 Q_tot 选择最优动作

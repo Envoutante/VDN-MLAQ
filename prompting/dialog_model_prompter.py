@@ -1091,7 +1091,7 @@ class DialogModelPrompter:
                 assert state_node is not None, f"state_node is None, state_desp:{state_desp}"
                 if self.algo == 'vdn-mlaq':
                     # with_ucb=True；不排除 virtual（想象需要可能选中 virtual 来调 LLM）
-                    action, best_child = self.temp_lang_tree.vdn_get_best(state_desp, with_ucb=True, without_virtual=False)
+                    action, best_child = self.temp_lang_tree.vdn_get_best(state_desp, with_ucb=True)
                 else:
                     action, best_child = state_node.get_best(with_ucb=True)  # 通过 UCB 选择最优动作和对应的子节点
 
