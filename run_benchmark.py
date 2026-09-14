@@ -9,8 +9,9 @@
         lang_tree.pth  memory.pth
 
 用法：
-    python run_benchmark.py                          # 默认配置，新建一个批次
-    python run_benchmark.py --max_opt 4              # 只跑到 optimal_steps=4
+    python run_benchmark.py                              # 默认配置，新建一个批次
+    python run_benchmark.py --max_opt 4                  # 只跑到 optimal_steps=4
+    python run_benchmark.py --llm MiniMax-M3             # 指定模型（默认取 LLM_SOURCE）
     python run_benchmark.py --epoch mlaq/20260729_1906   # 续跑/复用指定批次
 """
 
@@ -98,6 +99,7 @@ def main():
     # 解析简易参数
     max_opt = MAX_OPTIMAL_STEPS
     algo = ALGO
+    llm = LLM_SOURCE
     epoch = None
     i = 1
     while i < len(sys.argv):
@@ -110,6 +112,10 @@ def main():
             algo = sys.argv[i + 1]; i += 1
         elif arg.startswith("--algo="):
             algo = arg.split("=")[1]
+        elif arg == "--llm" and i + 1 < len(sys.argv):
+            llm = sys.argv[i + 1]; i += 1
+        elif arg.startswith("--llm="):
+            llm = arg.split("=")[1]
         elif arg == "--epoch" and i + 1 < len(sys.argv):
             epoch = sys.argv[i + 1]; i += 1
         elif arg.startswith("--epoch="):
@@ -135,7 +141,7 @@ def main():
         "--task", TASK,
         "--algo", algo,
         "--epoch", epoch,
-        "--llm_source", LLM_SOURCE,
+        "--llm_source", llm,
         "--tsteps", str(TSTEPS),
         "--num_runs", str(NUM_RUNS),
         "--skip_display",

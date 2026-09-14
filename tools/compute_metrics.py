@@ -269,8 +269,8 @@ def print_metrics_table(run_dirs: list, header: list = None):
 
 
 if __name__ == "__main__":
-    # 旧批次已迁移到 data/<task>/<algo>/<YYYYMMDD_HHMM>/（变体 B），run_0..run_5 对应 optimal_steps 1..6
-    BATCH = "data/sort_dialog/mlaq/20260729_1906"
+    # 路径 data/<task>/<algo>/<YYYYMMDD_HHMM>
+    BATCH = "data/sort_dialog/vdn-mlaq/20260910_2019"
     RUN_DIRS = [
         f"{BATCH}/run_0",
         f"{BATCH}/run_1",

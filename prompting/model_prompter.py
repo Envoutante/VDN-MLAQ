@@ -839,7 +839,7 @@ This previous [Action] failed to parse!: '{action}'
     def imagine_with_ucb(self, obs, horizon: int = 10, interrupt_flag=False):
         state_desp = self.env.get_state_prompt(obs)
         target_state_desp = self.env.target_state_desp
-        self.fill_temp_lang_tree(state_desp=state_desp, target_state_desp=target_state)
+        self.fill_temp_lang_tree(state_desp=state_desp, target_state_desp=target_state_desp)
 
         # set the stop flag, this flag is used to stop the imagination process and turn to an interaction test
         stop_flag = False
@@ -903,7 +903,7 @@ This previous [Action] failed to parse!: '{action}'
                             child = state_node.get_child(action)
                             assert child is not None, f"child is None, action: {action}"
                             next_state_desp = child.state
-                            final = (preprocess_state(next_state_desp) == preprocess_state(target_state))
+                            final = (preprocess_state(next_state_desp) == preprocess_state(target_state_desp))
                         elif imagine_info in ['action_failed', 'prediction_failed']:
                             # if the agent fails to generate a valid action or a valid prediction
                             restart = True
@@ -920,14 +920,14 @@ This previous [Action] failed to parse!: '{action}'
                     child = state_node.get_child(action)
                     assert child is not None, f"child is None, action: {action}"
                     next_state_desp = child.state
-                    final = (preprocess_state(next_state_desp) == preprocess_state(target_state))
+                    final = (preprocess_state(next_state_desp) == preprocess_state(target_state_desp))
                     failed = (next_state_desp == preprocess_state('Failure'))
 
                 if final or failed or restart:
                     if final:
                         # if the imagination reaches the target state
                         self.log(f"Imagination step {t}:\n{action}\n{next_state_desp}")
-                        self.log(f"Imagination reaches the target state:\n{target_state}")
+                        self.log(f"Imagination reaches the target state:\n{target_state_desp}")
                         self.temp_lang_tree.update(transition=[next_state_desp, 'nothing', 'Success'])
                         self.temp_lang_tree.get_node(next_state_desp).visit_num += 1
                         success_node = self.temp_lang_tree.get_node('Success')
@@ -947,7 +947,7 @@ This previous [Action] failed to parse!: '{action}'
                         self.log('------- Restart the imagination -------')
 
                     # compute the ucb values after each imagination step
-                    self.fill_temp_lang_tree(state_desp=state_desp, target_state_desp=target_state)
+                    self.fill_temp_lang_tree(state_desp=state_desp, target_state_desp=target_state_desp)
 
                     self.log('-------------- End {}th round imagination --------------\n'.format(self.round_index))
                     break
@@ -958,7 +958,7 @@ This previous [Action] failed to parse!: '{action}'
                     t += 1
 
                     # compute the ucb values after each imagination step
-                    self.fill_temp_lang_tree(state_desp=state_desp, target_state_desp=target_state)
+                    self.fill_temp_lang_tree(state_desp=state_desp, target_state_desp=target_state_desp)
 
                     if len(self.temp_lang_tree.nodes) > 40:
                         self.log('The temporary language tree is too large. The imagination process is terminated.')
@@ -966,7 +966,7 @@ This previous [Action] failed to parse!: '{action}'
 
             # summarize the data for this round
             stop_flag = self._summarize_this_round(
-                state_desp=state_desp, target_state_desp=target_state, interrupt_flag=interrupt_flag
+                state_desp=state_desp, target_state_desp=target_state_desp, interrupt_flag=interrupt_flag
             )
 
     def use_llm_to_imagine(self, state_desp, forbidden_actions, timestep=None):
@@ -995,7 +995,7 @@ This previous [Action] failed to parse!: '{action}'
     def get_llm_action(self, state_desp: str = None, feedbacks: list = [], forbidden_actions: list = [], timestep=None,
                        trial_id=None):
         target_state_desp = self.env.target_state_desp
-        policy_prompt = self.get_role_prompt('policy', state_desp, None, target_state, info={
+        policy_prompt = self.get_role_prompt('policy', state_desp, None, target_state_desp, info={
             'feedbacks': feedbacks, 'forbidden_actions': forbidden_actions
         })
         response = self.new_query_once(policy_prompt, use_stream=True, info={
@@ -1087,7 +1087,7 @@ This previous [Action] failed to parse!: '{action}'
 
         if transition_success:
             self.temp_lang_tree.update(transition)
-            if self.lang_tree.get_node(transition[-1]).state == preprocess_state(target_state):
+            if self.lang_tree.get_node(transition[-1]).state == preprocess_state(target_state_desp):
                 final = True
             return {'transition': transition, 'final': final, 'imagine_info': 'success'}
         else:
