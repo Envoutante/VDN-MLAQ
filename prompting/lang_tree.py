@@ -239,7 +239,8 @@ class Nodes:
 
 class LangTree:
     def __init__(self, load=False, if_temp_tree=False, tree_path='data/lang_tree.pth',
-                num_agents=1, q_alpha=None, q_gamma=0.995, agent_names=None):
+                num_agents=1, q_alpha=None, q_gamma=0.995, agent_names=None,
+                q_loop=1000, q_tol=1e-10):
         self.nodes = []
         self.if_temp_tree = if_temp_tree
         self.tree_path = tree_path
@@ -248,7 +249,11 @@ class LangTree:
         self.agent_names = list(agent_names) if agent_names else [f'agent{i}' for i in range(num_agents)]
         self.num_agents = len(self.agent_names)
         self.q_gamma = q_gamma
-        self.q_alpha = q_alpha if q_alpha is not None else 1.0 / max(1, self.num_agents)
+        # 写回时按 1/k 归一化，等效步长恒为 alpha，故 alpha 不再受 k_max 限制
+        # （实测：归一化后 alpha <= 0.4 稳定、>= 0.5 发散，且与 k_max 无关）
+        self.q_alpha = q_alpha if q_alpha is not None else 0.3
+        self.q_loop = q_loop      # 迭代轮数上限（归一化 + alpha=0.3 下实测需 200~350 轮）
+        self.q_tol = q_tol        # 收敛判据：max|delta| 小于此值即提前退出
         self.q_tables = [dict() for _ in range(self.num_agents)]   # 每个 agent 一张 Q 表 {(s, a_i): value}
         self.q_time = {'total': 0.0, 'calls': 0}   # 统计 Q 或 V 值的计算耗时
         self._joint_cache = {}   # 联合动作文本 -> {agent: 个体动作} 或 None，避免重复解析
@@ -504,12 +509,32 @@ class LangTree:
         # 返回最大 Q_tot 值
         return max(vals) if vals else 0.0
 
-    def vdn_compute_q_values(self, target_state, loop=20, tol=1e-6):
+    def vdn_compute_q_values(self, target_state, loop=None, tol=None):
         """
         遍历式 VDN 计算 Q_i
+        loop / tol 不传时取实例参数 q_loop / q_tol
         """
+        loop = self.q_loop if loop is None else loop
+        tol = self.q_tol if tol is None else tol
         _t0 = time.perf_counter()  # —— 计时：算 Q 值总耗时/次数（对比用）——
         target_state = preprocess_state(target_state)
+
+        # 预计算每个条目 (i, s, a_i) 被几条边共用 —— 写回时的归一化因子。
+        # 条目被 k 条边共用时一轮会收到 k 个 delta，按 1/k 归一化使等效步长恒为 alpha，
+        # 否则等效步长是 k·alpha，alpha 就被 k_max 卡死（实测 k_max=8 时 1/N 直接发散）。
+        share = {}
+        for node in self.nodes:
+            s = node.state
+            for child in node.children:
+                if child['action'] == 'action_virtual':
+                    continue
+                pa = self._parse_joint(child['action'])
+                if pa is None:
+                    continue
+                for i, ag in enumerate(self.agent_names):
+                    key = (i, s, pa[ag])
+                    share[key] = share.get(key, 0) + 1
+
         for _ in range(loop):
             # 1) 计算每个节点的 max Q_tot
             maxq = {}
@@ -546,22 +571,31 @@ class LangTree:
 
                     # 获取 s'
                     s_next = child['child'].state
-                    # 计算 tgt = r + γ * max Q_tot(s', a')
-                    tgt = 1.0 if s_next == target_state else self.q_gamma * maxq.get(s_next, 0.0)
+                    # 计算 tgt = r + γ(1-d) * max Q_tot(s', a')
+                    r = 1.0 if s_next == target_state else 0.0  # 稀疏奖励
+                    d = 1.0 if s_next == target_state else 0.0  # 目标状态终止
+                    tgt = r + self.q_gamma * (1 - d) * maxq.get(s_next, 0.0)
 
                     # 计算 delta = tgt - qt
                     updates.append((s, pa, tgt - qt))
 
             # 3) 同步写回各个 agent 的 Q_i 表
+            # 先把每个条目本轮收到的 delta 求和，再按 1/k 归一化后一次性写回
             max_delta = 0.0
+            acc = {}
             for s, pa, delta in updates:
                 # 获取本轮最大更新幅度
                 max_delta = max(max_delta, abs(delta))
 
-                # 更新每个 agent 的 Q_i(s, a_i) 值
                 for i, ag in enumerate(self.agent_names):
-                    key = (s, pa[ag])
-                    self.q_tables[i][key] = self.q_tables[i].get(key, 0.0) + self.q_alpha * delta
+                    key = (i, s, pa[ag])
+                    acc[key] = acc.get(key, 0.0) + delta
+
+            # 更新每个 agent 的 Q_i(s, a_i) 值（除以共用边数 k，使等效步长恒为 alpha）
+            for (i, s, a_i), total in acc.items():
+                k = share[(i, s, a_i)]
+                key = (s, a_i)
+                self.q_tables[i][key] = self.q_tables[i].get(key, 0.0) + (self.q_alpha / k) * total
 
             # 判断是否收敛
             if max_delta < tol:
@@ -570,7 +604,7 @@ class LangTree:
         self.q_time['total'] += time.perf_counter() - _t0
         self.q_time['calls'] += 1
 
-    def vdn_compute_ucb_values(self, target_state, loop=5):
+    def vdn_compute_ucb_values(self, target_state, loop=None):
         """
         计算 UCB 值
         """

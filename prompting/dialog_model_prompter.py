@@ -159,7 +159,7 @@ class DialogModelPrompter:
         """
         if self.algo == 'vdn-mlaq':
             # VDN：get_max_q_tot 对不在树的状态返回 0 → False，等价原 None 判断
-            self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
+            self.lang_tree.vdn_compute_q_values(target_state_desp)
             return self.lang_tree.get_max_q_tot(state_desp) > 0.5
         # MLAQ（值迭代）
         lang_tree = copy.deepcopy(self.lang_tree)  # 深拷贝 (避免影响永久树上的 value 值)
@@ -186,7 +186,7 @@ class DialogModelPrompter:
         # 若从初始状态到目标状态存在最优轨迹，则把该轨迹复制到临时语言树上
         if path_exist:
             if self.algo == 'vdn-mlaq':
-                self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
+                self.lang_tree.vdn_compute_q_values(target_state_desp)
             else:
                 self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
 
@@ -217,7 +217,7 @@ class DialogModelPrompter:
                     success_node.value = 1
 
             if self.algo == 'vdn-mlaq':
-                self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp, loop=20)  # 计算临时树上每个节点的 UCB 值（VDN 版）
+                self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp)  # 计算临时树上每个节点的 UCB 值（VDN 版）
             else:
                 self.temp_lang_tree.compute_ucb_values(loop=20)
 
@@ -237,7 +237,7 @@ class DialogModelPrompter:
         # 若从当前状态到目标状态存在最优轨迹，则把该轨迹复制到临时语言树上
         if path_exist:
             if self.algo == 'vdn-mlaq':
-                self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
+                self.lang_tree.vdn_compute_q_values(target_state_desp)
             else:
                 self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
 
@@ -275,7 +275,7 @@ class DialogModelPrompter:
                     success_node.value = 1
 
         if self.algo == 'vdn-mlaq':
-            self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp, loop=20)
+            self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp)
         else:
             self.temp_lang_tree.compute_ucb_values(loop=20)
 
@@ -293,7 +293,7 @@ class DialogModelPrompter:
         end_step = 0
         if path_exist:
             if self.algo == 'vdn-mlaq':
-                self.lang_tree.vdn_compute_q_values(target_state_desp, loop=20)
+                self.lang_tree.vdn_compute_q_values(target_state_desp)
             else:
                 self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
             reach_target = False
@@ -965,7 +965,7 @@ class DialogModelPrompter:
             if path_exist:
                 # 若存在候选最优轨迹则直接选择最优动作
                 if self.algo == 'vdn-mlaq':
-                    self.lang_tree.vdn_compute_q_values(self.env.target_state_desp, loop=20)
+                    self.lang_tree.vdn_compute_q_values(self.env.target_state_desp)
                     action, _ = self.lang_tree.vdn_get_best(state_desp)
                 else:
                     lang_tree = copy.deepcopy(self.lang_tree)
