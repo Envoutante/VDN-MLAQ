@@ -134,10 +134,10 @@ class DialogModelPrompter:
             load=load,
             if_temp_tree=False,
             tree_path=path.join(exp_output_dir(self.env.name, epoch_id, data_dir), 'lang_tree.pth'),
-            num_agents=len(self.robot_agent_names),
+            agent_names=self.robot_agent_names,
         )
 
-        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, num_agents=len(self.robot_agent_names))
+        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, agent_names=self.robot_agent_names)
         self.case_dir, self.simulate_save_dir, self.interact_save_dir = None, None, None
         self.round_save_dir, self.env_round_save_dir = None, None
         self.round_index = 1
@@ -175,7 +175,7 @@ class DialogModelPrompter:
         初始化临时语言树
         检查永久树中是否存在最优轨迹，若有则在临时树里添加，并计算 UCB 值
         """
-        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, num_agents=len(self.robot_agent_names))  # 创建临时语言树
+        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, agent_names=self.robot_agent_names)  # 创建临时语言树
 
         self.temp_lang_tree.build_virtual_node(state_desp)  # 为初始状态节点创建虚拟子节点
         self.temp_lang_tree.get_node(state_desp).visit_num += 1

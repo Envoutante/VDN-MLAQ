@@ -1,4 +1,4 @@
-import os, sys, time
+import os, sys, time, re
 
 # Fix Windows SSL cert store corruption (affects torch/aiohttp imports)
 try:
@@ -20,6 +20,10 @@ def preprocess_action(action):
     """
     action = action.replace("'''", "")
     action = action.replace("```", "")
+
+    # 逐行去除行尾空格
+    action = '\n'.join(line.rstrip() for line in action.split('\n'))
+
     for i in action:
         if i == '\n':
             action = action[1:]
@@ -44,6 +48,10 @@ def preprocess_state(state):
     state = state.replace("```", "")
     state = state.replace('[Prediction] Begin', '')
     state = state.replace('[Prediction] End', '')
+
+    # 逐行去除行尾空格
+    state = '\n'.join(line.rstrip() for line in state.split('\n'))
+
     for i in state:
         if i == '\n':
             state = state[1:]
@@ -59,6 +67,29 @@ def preprocess_state(state):
     state = state + '\n'
 
     return state
+
+
+_JOINT_ACTION_RE = re.compile(r'^NAME\s+(\S+)\s+ACTION\s+(.*)$')
+
+
+def parse_joint_action(action, agent_names):
+    """
+    把联合动作文本拆成 {agent: 个体动作}
+    """
+    out = {}
+    for line in action.split('\n'):
+        line = line.rstrip()
+        if not line or line.upper().startswith('EXECUTE'):
+            continue
+        m = _JOINT_ACTION_RE.match(line)
+        if not m:
+            return None
+        out[m.group(1)] = m.group(2).strip()
+
+    if not out or set(out) != set(agent_names):
+        return None
+
+    return out
 
 
 class Nodes:
@@ -208,16 +239,20 @@ class Nodes:
 
 class LangTree:
     def __init__(self, load=False, if_temp_tree=False, tree_path='data/lang_tree.pth',
-                num_agents=1, q_alpha=None, q_gamma=0.995):
+                num_agents=1, q_alpha=None, q_gamma=0.995, agent_names=None):
         self.nodes = []
         self.if_temp_tree = if_temp_tree
         self.tree_path = tree_path
-        # —— VDN：per-agent Q 表（对称投影 o_i=(s,i)、a_i=(a,i)）——
-        self.num_agents = num_agents
+
+        # VDN 相关参数
+        self.agent_names = list(agent_names) if agent_names else [f'agent{i}' for i in range(num_agents)]
+        self.num_agents = len(self.agent_names)
         self.q_gamma = q_gamma
-        self.q_alpha = q_alpha if q_alpha is not None else 1.0 / max(1, num_agents)
-        self.q_tables = [dict() for _ in range(num_agents)]   # 每 agent 一张 Q 表 {(s,i),(a,i): value}
-        self.q_time = {'total': 0.0, 'calls': 0}   # 统计"算 Q/V 值"累计耗时(秒)与次数（case 级对比用）
+        self.q_alpha = q_alpha if q_alpha is not None else 1.0 / max(1, self.num_agents)
+        self.q_tables = [dict() for _ in range(self.num_agents)]   # 每个 agent 一张 Q 表 {(s, a_i): value}
+        self.q_time = {'total': 0.0, 'calls': 0}   # 统计 Q 或 V 值的计算耗时
+        self._joint_cache = {}   # 联合动作文本 -> {agent: 个体动作} 或 None，避免重复解析
+
         if load:
             self.load(tree_path)
 
@@ -425,23 +460,48 @@ class LangTree:
                                             np.log(total_num) / child_node.visit_num)
                     # node.ucb_value = node.value / node.visit_num + 2 * np.sqrt(np.log(node.visit_num) / node.visit_num)
 
-    # ==================== VDN（对称投影 + 遍历式 Q 值迭代）====================
-    def get_q(self, i, s, a):
-        """agent i 在 (局部观测 s, 局部动作 a) 上的 Q 值（对称投影 o_i=(s,i)、a_i=(a,i)）。
-        s / a 需为已 preprocess 的状态/动作文本（node.state / child['action']）。"""
-        return self.q_tables[i].get(((s, i), (a, i)), 0.0)
+
+    # ==================== VDN（Q_i(s, a_i)）====================
+    def _parse_joint(self, action):
+        """
+        把联合动作文本拆成 {agent: 个体动作} (带缓存版)
+        """
+        # 把 cache 别名到 self._joint_cache
+        cache = getattr(self, '_joint_cache', None)
+        if cache is None:
+            cache = self._joint_cache = {}
+        # 若 cache 中没有 action 则解析并添加到 cache
+        if action not in cache:
+            cache[action] = parse_joint_action(action, self.agent_names)
+        # 返回拆解结果
+        return cache[action]
 
     def get_q_tot(self, s, a):
-        """联合 Q = Σ_i Q_i。"""
-        return sum(self.get_q(i, s, a) for i in range(self.num_agents))
+        """
+        获取 Q_tot(s,a) = Σ_i Q_i(s, a_i)
+        """
+        # 将联合动作文本拆成 {agent: 个体动作}
+        pa = self._parse_joint(a)
+        if pa is None:
+            return None
+        # 获取每个 agent 的 Q_i(s, a_i) 值并求和
+        return sum(self.q_tables[i].get((s, pa[ag]), 0.0)
+                    for i, ag in enumerate(self.agent_names))
 
     def get_max_q_tot(self, state):
-        """该状态所有出边的最大 Q_tot；无出边 / 状态不在树里返回 0。"""
+        """
+        获取状态 s 所有出边的最大 Q_tot 值
+        """
+        # 获取状态 s 对应的节点
         state_node = self.get_node(state)
         if state_node is None:
             return 0.0
-        vals = [self.get_q_tot(state_node.state, child['action'])
-                for child in state_node.children if child['action'] != 'action_virtual']
+        # 获取所有出边的 Q_tot 值
+        vals = [q for q in (self.get_q_tot(state_node.state, child['action'])
+                            for child in state_node.children
+                            if child['action'] != 'action_virtual')
+                if q is not None]
+        # 返回最大 Q_tot 值
         return max(vals) if vals else 0.0
 
     def vdn_compute_q_values(self, target_state, loop=20, tol=1e-6):
@@ -453,33 +513,57 @@ class LangTree:
         for _ in range(loop):
             # 1) 计算每个节点的 max Q_tot
             maxq = {}
+            # 遍历所有全局状态节点
             for node in self.nodes:
-                vals = [self.get_q_tot(node.state, child['action'])
-                        for child in node.children if child['action'] != 'action_virtual']
+                # 获取所有出边的 Q_tot 值
+                vals = [q for q in (self.get_q_tot(node.state, child['action'])
+                                    for child in node.children
+                                    if child['action'] != 'action_virtual')
+                        if q is not None]
+                # 记录最大 Q_tot 值
                 maxq[node.state] = max(vals) if vals else 0.0
 
             # 2) 计算每条边的 delta
             updates = []
+            # 遍历所有节点
             for node in self.nodes:
                 s = node.state
+                # 遍历所有子节点，计算每条边的 delta
                 for child in node.children:
+                    # 获取 a
                     a = child['action']
                     if a == 'action_virtual':
                         continue
+
+                    # 拆解 a 得到 a_i
+                    pa = self._parse_joint(a)
+                    if pa is None:
+                        continue
+
+                    # 计算 qt = Σ_i Q_i(s, a_i)
+                    qt = sum(self.q_tables[i].get((s, pa[ag]), 0.0)
+                                for i, ag in enumerate(self.agent_names))
+
+                    # 获取 s'
                     s_next = child['child'].state
-                    r = 1.0 if s_next == target_state else 0.0
-                    d = 1.0 if s_next == target_state else 0.0
-                    tgt = r + self.q_gamma * (1 - d) * maxq.get(s_next, 0.0)
-                    updates.append((s, a, tgt - self.get_q_tot(s, a)))
+                    # 计算 tgt = r + γ * max Q_tot(s', a')
+                    tgt = 1.0 if s_next == target_state else self.q_gamma * maxq.get(s_next, 0.0)
+
+                    # 计算 delta = tgt - qt
+                    updates.append((s, pa, tgt - qt))
 
             # 3) 同步写回各个 agent 的 Q_i 表
             max_delta = 0.0
-            for s, a, delta in updates:
+            for s, pa, delta in updates:
+                # 获取本轮最大更新幅度
                 max_delta = max(max_delta, abs(delta))
-                for i in range(self.num_agents):
-                    key = ((s, i), (a, i))
+
+                # 更新每个 agent 的 Q_i(s, a_i) 值
+                for i, ag in enumerate(self.agent_names):
+                    key = (s, pa[ag])
                     self.q_tables[i][key] = self.q_tables[i].get(key, 0.0) + self.q_alpha * delta
 
+            # 判断是否收敛
             if max_delta < tol:
                 break
 
@@ -505,6 +589,8 @@ class LangTree:
 
                 # 计算 Q_tot 值
                 q = self.get_q_tot(node.state, child['action'])
+                if q is None:
+                    continue
 
                 child_node.ucb_value = q / visit + 2 * np.sqrt(np.log(max(1, total_num)) / visit)
 
@@ -532,6 +618,8 @@ class LangTree:
             else:
                 # 根据 Q_tot 值选择最优动作 —— 环境交互阶段
                 sc = self.get_q_tot(state_node.state, action)
+                if sc is None:  # 拆不出 per-agent 动作的边不参与选择
+                    continue
 
             if sc > best_score:
                 best_score, best_action, best_child = sc, action, child['child']
