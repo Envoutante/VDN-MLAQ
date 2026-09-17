@@ -512,7 +512,6 @@ class LangTree:
     def vdn_compute_q_values(self, target_state, loop=None, tol=None):
         """
         遍历式 VDN 计算 Q_i
-        loop / tol 不传时取实例参数 q_loop / q_tol
         """
         loop = self.q_loop if loop is None else loop
         tol = self.q_tol if tol is None else tol
@@ -623,8 +622,10 @@ class LangTree:
 
                 # 计算 Q_tot 值
                 q = self.get_q_tot(node.state, child['action'])
+
+                # 拆不出 per-agent 动作的边 (只有虚拟边会走到)
                 if q is None:
-                    continue
+                    q = child_node.value
 
                 child_node.ucb_value = q / visit + 2 * np.sqrt(np.log(max(1, total_num)) / visit)
 
