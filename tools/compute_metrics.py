@@ -269,17 +269,31 @@ def print_metrics_table(run_dirs: list, header: list = None):
 
 
 if __name__ == "__main__":
-    # 路径 data/<task>/<algo>/<YYYYMMDD_HHMM>
-    BATCH = "data/sort_dialog/vdn-mlaq/20260910_2019"
-    RUN_DIRS = [
-        f"{BATCH}/run_0",
-        f"{BATCH}/run_1",
-        f"{BATCH}/run_2",
-        f"{BATCH}/run_3",
-        f"{BATCH}/run_4",
-        f"{BATCH}/run_5",
+    # 批次路径 data/<task>/<algo>/<YYYYMMDD_HHMM>
+    BATCHES = [
+        "data/sort_dialog/mlaq/20260917_1615",
+        "data/sort_dialog/vdn-mlaq/20260917_1555",
     ]
+
+    # 每个批次下要统计的 run_id
+    RUN_IDS = range(6)
+
     project_root = os.path.dirname(os.path.dirname(__file__))
-    run_dirs = [os.path.join(project_root, rd) for rd in RUN_DIRS]
-    header = [f"opt={i}" for i in range(1, len(run_dirs) + 1)]
-    print_metrics_table(run_dirs, header=header)
+    for batch in BATCHES:
+        run_dirs, header = [], []
+
+        # 只打印真实存在的 run 目录
+        for run_id in RUN_IDS:
+            run_dir = os.path.join(project_root, batch, f"run_{run_id}")
+            if os.path.isdir(run_dir):
+                run_dirs.append(run_dir)
+                header.append(f"opt={run_id + 1}")
+
+        print(f"\n{'=' * 80}")
+        print(f"  {batch}")
+        print(f"{'=' * 80}")
+        if not run_dirs:
+            print("  [跳过] 该批次下没有任何 run 目录")
+            continue
+
+        print_metrics_table(run_dirs, header=header)
