@@ -13,6 +13,7 @@ from datetime import datetime
 from prompting.lang_tree import LangTree, preprocess_state, preprocess_action
 from prompting.paths import exp_output_dir
 from tools.minimax_quota import handle_api_error
+from tools.q_consistency import QConsistencyRecorder
 from rocobench.envs import EnvState
 
 # assert os.path.exists("openai_key.json"), "Please put your OpenAI API key in a string in robot-collab/openai_key.json"
@@ -58,7 +59,8 @@ class DialogModelPrompter:
             llm_source: str = "gpt-4",
             load: bool = False,
             skip_check_memory: bool = False,
-            algo: str = "mlaq"      # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN（精确匹配 == 'vdn-mlaq'）
+            algo: str = "mlaq",     # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN（精确匹配 == 'vdn-mlaq'）
+            compare_q: bool = False  # 旁路记录两套 Q 与动作选择的一致性（见 tools/q_consistency.py）
     ):
         self.max_tokens = max_tokens
         self.debug_mode = debug_mode
@@ -68,6 +70,8 @@ class DialogModelPrompter:
         self.robot_name_map = robot_name_map
         self.robot_agent_names = list(robot_name_map.values())
         self.algo = algo   # "mlaq"(值迭代) / "vdn-mlaq"(遍历式 VDN)
+        # 旁路记录器：只读树、不写节点属性，关闭时为 None（不产生任何开销）
+        self.q_recorder = QConsistencyRecorder() if compare_q else None
         self.num_replans = num_replans
         self.env = env
         self.feedback_manager = feedback_manager
@@ -152,6 +156,49 @@ class DialogModelPrompter:
     """
     --------------------------------------- 语言树管理 (起) ---------------------------------------
     """
+
+    # ===== Q 一致性旁路记录（--compare_q 开启时才生效；逻辑在 tools/q_consistency.py）=====
+    def _qcompare(self, tree, *, owner=None, ucb=False, loop=20):
+        """主算法算完后，只在副本上计算对照算法；不计入主算法耗时。"""
+        if self.q_recorder is None:
+            return
+        try:
+            self.q_recorder.observe_compute(
+                tree, self.algo, self.env.target_state_desp,
+                owner=owner, ucb=ucb, loop=loop)
+        except Exception as e:
+            self.log(f'[q_consistency] comparison failed: {e}')
+
+    def _qrec(self, tree, state, phase, actual_action, site=None, ucb=False,
+              without_virtual=False, owner=None):
+        """记录一次 get_best：两套 Q/UCB + 各自选中的动作。记录失败不影响实验。"""
+        if self.q_recorder is None:
+            return
+        if site is None:
+            import sys as _sys
+            site = _sys._getframe(1).f_code.co_name   # 调用点所在函数名
+        try:
+            self.q_recorder.record_get_best(tree, state, phase, site,
+                                            algo=self.algo, actual_action=actual_action,
+                                            owner=owner, ucb=ucb,
+                                            without_virtual=without_virtual)
+        except Exception as e:
+            self.log(f'[q_consistency] record_get_best failed: {e}')
+
+    def finish_q_consistency(self):
+        """case 收尾：整棵树的 Q 表 → <case_dir>/q_consistency.xlsx"""
+        if self.q_recorder is None:
+            return None
+        try:
+            self.q_recorder.record_case_end(self.lang_tree, algo=self.algo)
+        except Exception as e:
+            self.log(f'[q_consistency] case_end snapshot failed: {e}')
+        try:
+            return self.q_recorder.finish_case(self.lang_tree)
+        except Exception as e:
+            self.log(f'[q_consistency] export failed: {e}')
+            return None
+
     def check_path_exist(self, state_desp, target_state_desp):
         """
         判断永久树中是否存在从当前状态到目标状态的最优轨迹
@@ -160,6 +207,7 @@ class DialogModelPrompter:
         if self.algo == 'vdn-mlaq':
             # VDN：get_max_q_tot 对不在树的状态返回 0 → False，等价原 None 判断
             self.lang_tree.vdn_compute_q_values(target_state_desp)
+            self._qcompare(self.lang_tree, loop=10)
             return self.lang_tree.get_max_q_tot(state_desp) > 0.5
         # MLAQ（值迭代）
         lang_tree = copy.deepcopy(self.lang_tree)  # 深拷贝 (避免影响永久树上的 value 值)
@@ -168,6 +216,7 @@ class DialogModelPrompter:
         if target_state_desp_node is None or state_node is None:
             return False
         lang_tree.compute_values(target_state=target_state_desp, loop=10)
+        self._qcompare(lang_tree, owner=self.lang_tree, loop=10)
         return state_node.value > 0.5
 
     def initial_temp_lang_tree(self, state_desp, target_state_desp):
@@ -190,6 +239,8 @@ class DialogModelPrompter:
             else:
                 self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
 
+            self._qcompare(self.lang_tree)
+
             # 把永久树上的最优轨迹复制到临时树上
             reach_target = False
             while not reach_target:
@@ -198,6 +249,7 @@ class DialogModelPrompter:
                     action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 else:
                     action, next_state_node = state_node.get_best()
+                self._qrec(self.lang_tree, state_node.state, 'imagine', action)
 
                 # 把 (s, a, s') 复制到临时树上
                 self.temp_lang_tree.update(transition=[state_node.state, action, next_state_node.state])  # 把 (s, a, s') 加入到临时树上
@@ -220,6 +272,7 @@ class DialogModelPrompter:
                 self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp)  # 计算临时树上每个节点的 UCB 值（VDN 版）
             else:
                 self.temp_lang_tree.compute_ucb_values(loop=20)
+            self._qcompare(self.temp_lang_tree, ucb=True)
 
     def fill_temp_lang_tree(self, state_desp, target_state_desp):
         """
@@ -241,6 +294,8 @@ class DialogModelPrompter:
             else:
                 self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
 
+            self._qcompare(self.lang_tree)
+
             # 把永久树上的最优轨迹复制到临时树上
             reach_target = False
             while not reach_target:
@@ -249,6 +304,7 @@ class DialogModelPrompter:
                     action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 else:
                     action, next_state_node = state_node.get_best()
+                self._qrec(self.lang_tree, state_node.state, 'imagine', action)
 
                 self.temp_lang_tree.update(transition=[state_node.state, action, next_state_node.state])  # 把 (s, a, s') 加入到临时树上
                 self.temp_lang_tree.build_virtual_node(next_state_node.state)  # 为 s' 创建虚拟子节点
@@ -278,6 +334,7 @@ class DialogModelPrompter:
             self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp)
         else:
             self.temp_lang_tree.compute_ucb_values(loop=20)
+        self._qcompare(self.temp_lang_tree, ucb=True)
 
     """
     --------------------------------------- 语言树管理 (终) ---------------------------------------
@@ -296,6 +353,7 @@ class DialogModelPrompter:
                 self.lang_tree.vdn_compute_q_values(target_state_desp)
             else:
                 self.lang_tree.compute_values(target_state=preprocess_state(target_state_desp), loop=20)
+            self._qcompare(self.lang_tree)
             reach_target = False
             state_desp = self.state_desp
             while not reach_target:
@@ -304,6 +362,7 @@ class DialogModelPrompter:
                     action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 else:
                     action, next_state_node = state_node.get_best()
+                self._qrec(self.lang_tree, state_node.state, 'evaluation', action)
                 end_step += 1
                 state_desp = next_state_node.state
 
@@ -343,6 +402,10 @@ class DialogModelPrompter:
 
         self.round_index = 1  # 控制 imagination 的次数
         self.state_desp = None
+
+        # 旁路记录：开启一个新 case 的 Q 一致性记录
+        if self.q_recorder is not None:
+            self.q_recorder.start_case(self.case_dir, self.env.target_state_desp)
 
     def get_summary(self):
         return copy.deepcopy(self.consumed_token), copy.deepcopy(self.memory_ratio)
@@ -966,11 +1029,16 @@ class DialogModelPrompter:
                 # 若存在候选最优轨迹则直接选择最优动作
                 if self.algo == 'vdn-mlaq':
                     self.lang_tree.vdn_compute_q_values(self.env.target_state_desp)
+                    decision_tree = self.lang_tree
+                    self._qcompare(decision_tree, loop=100)
                     action, _ = self.lang_tree.vdn_get_best(state_desp)
                 else:
                     lang_tree = copy.deepcopy(self.lang_tree)
                     lang_tree.compute_values(target_state=self.env.target_state_desp, loop=100)
+                    decision_tree = lang_tree
+                    self._qcompare(decision_tree, owner=self.lang_tree, loop=100)
                     action, _ = lang_tree.get_node(state_desp).get_best()
+                self._qrec(decision_tree, state_desp, 'interact', action, owner=self.lang_tree)
             else:
                 # 若不存在候选最优轨迹
                 if self.get_imagine_flag(state_desp):
@@ -1108,6 +1176,7 @@ class DialogModelPrompter:
                     action, best_child = self.temp_lang_tree.vdn_get_best(state_desp, with_ucb=True)
                 else:
                     action, best_child = state_node.get_best(with_ucb=True)  # 通过 UCB 选择最优动作和对应的子节点
+                self._qrec(self.temp_lang_tree, state_desp, 'imagine', action, ucb=True)
 
                 if action == 'action_virtual':
                     # 若选到虚拟子节点
@@ -1145,6 +1214,8 @@ class DialogModelPrompter:
                             action, best_child = self.temp_lang_tree.vdn_get_best(state_desp, with_ucb=True, without_virtual=True)
                         else:
                             action, best_child = state_node.get_best(with_ucb=True, without_virtual=True)
+                        self._qrec(self.temp_lang_tree, state_desp, 'imagine',
+                                    action, ucb=True, without_virtual=True)
                         action_history.append(action)
                         assert best_child is not None, f"child is None, action: {action}"
                         next_state_desp = best_child.state

@@ -164,6 +164,7 @@ def main(args):
             tree_load=args.tree_load,
             skip_check_memory=args.skip_check_memory,
             algo=args.algo,   # algo 名选择：mlaq=值迭代 / vdn-mlaq=遍历式 VDN
+            compare_q=args.compare_q,   # 旁路记录两套 Q 与动作选择的一致性（每个 case 一个 excel）
         )
 
         # 运行 runner
@@ -245,6 +246,8 @@ if __name__ == "__main__":
     parser.add_argument("--no_feedback", "-nf", action="store_true")
     parser.add_argument("--pre_imagine", "-pi", action="store_true")
     parser.add_argument("--skip_check_memory", "-sca", action="store_true")
+    parser.add_argument("--compare_q", action="store_true",
+                        help="旁路记录两套 Q（MLAQ 值迭代 / VDN）与动作选择的一致性，每个 case 写一个 q_consistency.xlsx")
     logging.basicConfig(level=logging.INFO)
 
     args = parser.parse_args()

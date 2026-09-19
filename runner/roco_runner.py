@@ -60,7 +60,8 @@ class LLMRunner:
             llm_source: str = "gpt4",
             tree_load: bool = False,
             skip_check_memory: bool = False,
-            algo: str = "mlaq"      # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN
+            algo: str = "mlaq",     # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN
+            compare_q: bool = False  # 旁路记录两套 Q 与动作选择的一致性
     ):
         self.env = env
         self.env.reset()
@@ -69,6 +70,7 @@ class LLMRunner:
         self.data_dir = data_dir
         self.run_name = run_name
         self.algo = algo   # 透传给 prompter：mlaq / vdn
+        self.compare_q = compare_q
 
         # NOTE: the run directory is data/env_name, or data/env_name/<epoch_id> (epoch_id = "<算法>/<YYYYMMDD_HHMM>")
         run_dir = exp_output_dir(self.env.name, epoch_id, self.data_dir)
@@ -145,7 +147,8 @@ class LLMRunner:
                 llm_source=llm_source,
                 load=self.tree_load,
                 skip_check_memory=skip_check_memory,
-                algo=self.algo
+                algo=self.algo,
+                compare_q=self.compare_q
             )
         else:
             self.prompter = ModelPrompter(
@@ -461,4 +464,7 @@ class LLMRunner:
                 print("额度恢复后用以下命令续跑（断点恢复，已完成的 case 不会重跑）：")
                 print(f"    python run_benchmark.py --epoch {epoch}")
                 sys.exit(1)
+            finally:
+                # case 收尾：写本 case 的 Q 一致性表（--compare_q 关闭时为空操作）
+                self.prompter.finish_q_consistency()
             print(f"============ Case {case_id} ends ============\n\n")

@@ -101,6 +101,7 @@ def main():
     algo = ALGO
     llm = LLM_SOURCE
     epoch = None
+    compare_q = False
     i = 1
     while i < len(sys.argv):
         arg = sys.argv[i]
@@ -120,6 +121,8 @@ def main():
             epoch = sys.argv[i + 1]; i += 1
         elif arg.startswith("--epoch="):
             epoch = arg.split("=")[1]
+        elif arg == "--compare_q":
+            compare_q = True
         i += 1
 
     project_root = os.path.dirname(os.path.abspath(__file__))
@@ -146,6 +149,8 @@ def main():
         "--num_runs", str(NUM_RUNS),
         "--skip_display",
     ]
+    if compare_q:
+        base_args.append("--compare_q")
 
     for opt in range(resume_run_id + 1 if resume_case_id > 0 else 1, max_opt + 1):
         run_id = opt - 1
