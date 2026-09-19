@@ -10,7 +10,7 @@ import os.path as path
 from typing import Dict
 from datetime import datetime
 
-from prompting.lang_tree import LangTree, preprocess_state, preprocess_action
+from prompting.lang_tree import LangTree, preprocess_state, preprocess_action, parse_joint_action
 from prompting.paths import exp_output_dir
 from tools.minimax_quota import handle_api_error
 from tools.q_consistency import QConsistencyRecorder
@@ -1191,7 +1191,7 @@ class DialogModelPrompter:
                     ]
 
                     # 调用 LLM 想象动作 a 和下一状态 s'
-                    imagine_results = self.imagine_trajectories(
+                    imagine_results = self.imagine_transition(
                         state_desp=state_desp, forbidden_actions=forbidden_actions, action_history=action_history, timestep=t
                     )
 
@@ -1344,13 +1344,56 @@ class DialogModelPrompter:
             else:
                 return False
 
-    def imagine_trajectories(self, state_desp: str = None, forbidden_actions: list = [], action_history: list = [],
-                            timestep=None):
+    def imagine_transition(self, state_desp: str, forbidden_actions=None,
+                            action_history=None, timestep=0):
         """
-        LLM 根据 s 预测出 (s, a, s')
-        1. 调用 get_llm_action 预测出 a 并调用 check_action 进行检测
-        2. 调用 imagine_transition 预测出 s' 并调用 check_prediction 进行检测
+        想象一条转移
+
+        1. predict_action：预测动作、检查动作及重试
+        2. predict_next_state：复用记忆，或预测下一状态、检查下一状态及重试
+        3. 本函数统一更新树；预测函数不写树
         """
+        # 预测动作 a
+        action, status = self.predict_action(
+            state_desp, forbidden_actions or [], action_history or [], timestep)
+        if status != 'success':
+            if status == 'failure':
+                # 保留原完整联合提案的 ERROR 行为；不用于局部提案失败。
+                self.temp_lang_tree.update(transition=[state_desp, 'ERROR', 'Failure'])
+            return {'transition': None, 'imagine_info': status}
+        action = preprocess_action(action)
+
+        # 预测下一状态 s'，并标明是复用记忆还是新预测的
+        next_state, source = self.predict_next_state(state_desp, action, timestep)
+        if next_state is None:
+            return {'transition': None, 'imagine_info': 'prediction_failed'}
+
+        # 拼接得到 transition
+        transition = [state_desp, action, next_state]
+
+        # 更新统计信息并写入永久树
+        if source == 'memory':
+            self.temp_memory_ratio['memory_count'] += 1
+        else:
+            self.lang_tree.update(transition)
+            self.temp_memory_ratio['llm_count'] += 1
+
+        if self.env.if_fail(next_state):
+            return {'transition': transition, 'imagine_info': 'failure'}
+
+        # 写入临时树并挂上虚拟子节点
+        self.temp_lang_tree.update(transition)
+        self.temp_lang_tree.build_virtual_node(next_state)
+        return {'transition': transition, 'imagine_info': 'success'}
+
+    def predict_action(self, state_desp, forbidden_actions=None,
+                        action_history=None, timestep=0):
+        """完整联合动作提案 + 检查，保留原重试策略；返回 (动作, 状态)。
+
+        不预测下一状态、不更新树。单轮提案由 get_llm_action 负责。
+        """
+        forbidden_actions = forbidden_actions or []
+        action_history = action_history or []
         action, feedbacks = None, []
         trial, action_success = 0, False
 
@@ -1376,51 +1419,12 @@ class DialogModelPrompter:
         if not action_success:
             if len(forbidden_actions) == 0:
                 if 'ERROR' in action:
-                    # 表示 "此路不通"
-                    self.temp_lang_tree.update(transition=[state_desp, 'ERROR', 'Failure'])
-                    return {'transition': None, 'imagine_info': 'failure'}
+                    return None, 'failure'
                 else:
-                    return {'transition': None, 'imagine_info': 'action_failed'}
+                    return None, 'action_failed'
             else:  # 除禁用动作外 LLM 想不出任何可用动作
-                return {'transition': None, 'imagine_info': 'exhausted'}
-
-        # 处理获取到的动作 a 的格式
-        action = preprocess_action(action)
-
-        # after this step, we assume that the action is valid
-
-        # 获取下一状态 s'
-        state_node = self.lang_tree.get_node(state_desp)  # 在永久树中找到当前状态节点
-        transition_success, transition = False, None
-
-        # 若永久树中存在 (s, a) 则直接使用永久树中的 s'
-        if state_node:
-            for child in state_node.children:
-                if action == child['action']:  # 若 s 的子节点动作中存在 a
-                    transition = [state_desp, action, child['child'].state]
-                    self.log('Transition exists. Use the existing transition.\n')
-                    self.temp_memory_ratio['memory_count'] += 1
-                    transition_success = True
-                    break
-
-        # 若永久树中不存在 (s, a) 则调用 LLM 想象 s'
-        if not transition_success:
-            transition_success, transition = self.imagine_transition(state_desp, action, timestep)
-            if transition_success:
-                self.lang_tree.update(transition)  # 将想象出的 (s, a, s') 更新到永久树中
-                self.temp_memory_ratio['llm_count'] += 1
-
-        if transition is not None:
-            if self.env.if_fail(transition[-1]):  # 调用环境判断 s' 是否合理
-                return {'transition': transition, 'imagine_info': 'failure'}
-
-        if transition_success:
-            # 把想象出的 (s, a, s') 更新到临时树中
-            self.temp_lang_tree.update(transition)
-            self.temp_lang_tree.build_virtual_node(transition[-1])
-            return {'transition': transition, 'imagine_info': 'success'}
-        else:
-            return {'transition': None, 'imagine_info': 'prediction_failed'}
+                return None, 'exhausted'
+        return action, 'success'
 
     def get_llm_action(self, obs, feedbacks: list = [], forbidden_actions: list = [], action_history: list = [],
                     timestep=None, trial_id=None):
@@ -1444,10 +1448,142 @@ class DialogModelPrompter:
 
         return action, agent_responses
 
-    def imagine_transition(self, state: str, action: str, timestep=None):
+    def _parse_individual_proposal(response, agent):
         """
-        LLM 根据 (s, a) 预测 s'
+        根据指定 agent 的一行 NAME ... ACTION ... 解析个体动作
         """
+        # 要求 LLM 的回复是字符串格式
+        if not isinstance(response, str):
+            return None
+
+        # 去掉首尾空白后按行切开
+        lines = response.strip().splitlines()
+
+        # 必须正好一行，且行首是 NAME {agent} ACTION 这个固定前缀
+        if len(lines) != 1 or not lines[0].startswith(f'NAME {agent} ACTION '):
+            return None
+
+        # 解析该行以得到 {agent: 动作} 的字典
+        parts = parse_joint_action(lines[0], [agent])
+        if parts is None or not parts[agent] or parts[agent] == 'ERROR':
+            return None
+
+        # 返回指定 agent 的个体动作
+        return parts[agent]
+
+    def _build_local_joint_action(anchor_action, agent, individual_action, agent_names):
+        """
+        只替换基准联合动作中指定 agent 对应的个体动作
+        返回新的联合动作
+        """
+        if agent not in agent_names:
+            raise ValueError(f'Unknown agent: {agent}')
+
+        # 解析基准联合动作以得到 {agent: 动作}
+        parts = parse_joint_action(anchor_action, agent_names)
+
+        # 提取实际的动作行，排除空行和 EXECUTE
+        lines = [line for line in anchor_action.splitlines()
+                    if line.strip() and line.strip() != 'EXECUTE']
+
+        # 校验基准联合动作的格式
+        if parts is None or len(lines) != len(agent_names) or any(not a for a in parts.values()):
+            raise ValueError('Invalid anchor joint action')
+
+        # 校验个体动作的格式
+        if not isinstance(individual_action, str) or len(individual_action.strip().splitlines()) != 1:
+            raise ValueError('Individual action must be one non-empty line')
+
+        # 提取新的个体动作
+        action = individual_action.strip()
+        if action == 'ERROR' or 'NAME ' in action or 'ACTION ' in action:
+            raise ValueError('Expected an individual action, not a joint action or ERROR')
+        parts[agent] = action
+
+        # 返回新的联合动作
+        return preprocess_action('\n'.join(
+            f'NAME {name} ACTION {parts[name]}' for name in agent_names))
+
+    def get_llm_local_action(self, state, anchor_action, agent,
+                                    excluded_actions=None, feedbacks=None,
+                                    timestep=0, trial_id=0):
+        """
+        调用 LLM 获取单 agent 的个体动作，返回 (联合动作或 None, 原始回复)
+        """
+        # 校验基准联合动作是否合法
+        self._build_local_joint_action(anchor_action, agent, 'WAIT', self.robot_agent_names)
+
+        # 从基准联合动作中获取 agent 当前的个体动作
+        parts = self.lang_tree._parse_joint(anchor_action)
+
+        # 排除状态 s 下 agent 当前的个体动作、已尝试过的动作、传入的 excluded_actions
+        excluded = set(self.lang_tree.get_individual_actions(state, agent))
+        excluded.update(a.strip() for a in (excluded_actions or []))
+        excluded.add(parts[agent])
+
+        # 复用常规对话的系统提示词
+        system_prompt = self.compose_system_prompt(
+            state, agent, feedback_history=feedbacks or [])
+
+        # 追加要求单行输出
+        system_prompt += (
+            '\n[Local Exploration Mode]\n'
+            'This call proposes only one individual action, not a group dialogue. '
+            'The single-line output contract below replaces the usual dialogue '
+            'and EXECUTE/PROCEED output format. Keep all other agents fixed.\n'
+        )
+
+        # 设置用户提示词
+        user_prompt = (
+            f'[Current State]\n{state}\n'
+            f'[Target State]\n{self.env.target_state_desp}\n'
+            f'[Anchor Joint Action]\n{anchor_action}\n'
+            f'Only replace the action of {agent}. All other actions above are fixed.\n'
+            '[Excluded Individual Actions]\n' + '\n'.join(sorted(excluded)) + '\n'
+            'Propose an untried individual action compatible with the fixed actions '
+            'and task rules. Consider helping the team, not only your own progress. '
+            'Do not repeat an excluded action.\n'
+            f'Output exactly one line: NAME {agent} ACTION <individual action>\n'
+            'No explanation, code fences, EXECUTE, PROCEED, or other agents. '
+            'If you cannot propose one, output exactly ERROR.\n'
+        )
+
+        # 调用 LLM 获取指定 agent 的个体动作
+        response = self.new_query_once(
+            prompt={'system_prompt': system_prompt, 'user_prompt': user_prompt},
+            use_stream=True,
+            info={'role': agent + '_local', 'timestep': timestep,
+                    'id': trial_id, 'property': 'main'})
+
+        # 解析 LLM 的回复以提取指定 agent 的个体动作
+        action = self._parse_individual_proposal(response, agent)
+        if action is None or action in excluded:
+            return None, response
+
+        # 尝试构建新的联合动作
+        try:
+            joint_action = self._build_local_joint_action(
+                anchor_action, agent, action, self.robot_agent_names)
+        except ValueError:
+            return None, response
+
+        # 返回新的联合动作和原始回复
+        return joint_action, response
+
+    def predict_next_state(self, state: str, action: str, timestep=0):
+        """
+        复用已有下一状态或预测新的下一状态
+        """
+        # 若永久树中存在 (s, a) 则直接复用 s'
+        action = preprocess_action(action)
+        state_node = self.lang_tree.get_node(state)
+        if state_node:
+            for child in state_node.children:
+                if action == child['action']:
+                    self.log('Transition exists. Use the existing transition.\n')
+                    return child['child'].state, 'memory'
+
+        # 若永久树中不存在 (s, a) 则预测 s'
         self.log('----- Imagine the transition -----')
 
         prediction_passed = False
@@ -1457,20 +1593,17 @@ class DialogModelPrompter:
         while trial < 3:
             predictor_prompt = self.get_role_prompt(
                 'predictor', state, action, next_state=None,
-                info={'feedbacks': predictor_feedback}
-            )
+                info={'feedbacks': predictor_feedback})
             predictor_response = self.new_query_once(predictor_prompt, use_stream=True, info={
-                'role': 'world_model', 'timestep': timestep + 1, 'id': trial + 1, 'property': 'main'
-            })
-
-            predicted_next_state = self.env.process_state(predictor_response)
-            predicted_next_state = preprocess_state(predicted_next_state)
+                'role': 'world_model', 'timestep': timestep + 1,
+                'id': trial + 1, 'property': 'main'})
+            predicted_next_state = preprocess_state(self.env.process_state(predictor_response))
 
             if 'ERROR' in predicted_next_state:  # 若直接预测出错
                 prediction_passed = False
                 feedback = 'The prediction is invalid.'
             else:  # 若预测正常则调用 LLM 检查预测结果是否合理
-                prediction_passed, feedback = self.check_prediction(
+                prediction_passed, feedback = self.check_next_state(
                     state, action, predicted_next_state, timestep + 1, trial + 1
                 )
 
@@ -1482,9 +1615,9 @@ class DialogModelPrompter:
             predictor_feedback = self._process_prediction_feedback(feedback)  # 把 LLM (检测) 的反馈包装成 prompt 片段以注入到对 LLM (预测) 的下一次请求中
 
         if not prediction_passed:
-            return False, None
+            return None, None
 
-        return True, [state, action, predicted_next_state]
+        return predicted_next_state, 'llm'
 
     def check_action(self, state: str, action: str, timestep=None, trial_id=None):
         """
@@ -1532,7 +1665,7 @@ class DialogModelPrompter:
         else:  # 若合理则返回 True 和 None
             return True, None
 
-    def check_prediction(self, state: str, action: str, prediction: str, timestep=None, trial_id=None):
+    def check_next_state(self, state: str, action: str, prediction: str, timestep=None, trial_id=None):
         """
         调用 LLM 判断 LLM 预测的下一状态是否合理
         """
@@ -1572,7 +1705,7 @@ class DialogModelPrompter:
 
     def _process_prediction_feedback(self, feedback: str):
         """
-        当前 s' 未通过检测时供 imagine_transition 使用
+        当前 s' 未通过检测时供 predict_next_state 使用
         把 LLM (检测) 的反馈包装成 prompt 片段以注入到对 LLM (预测) 的下一次请求中
         """
         if feedback is not None:

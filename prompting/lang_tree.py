@@ -466,7 +466,9 @@ class LangTree:
                     # node.ucb_value = node.value / node.visit_num + 2 * np.sqrt(np.log(node.visit_num) / node.visit_num)
 
 
-    # ==================== VDN（Q_i(s, a_i)）====================
+    """
+    --------------------------------------- VDN (Q_i(s, a_i)) ---------------------------------------
+    """
     def _parse_joint(self, action):
         """
         把联合动作文本拆成 {agent: 个体动作} (带缓存版)
@@ -481,9 +483,50 @@ class LangTree:
         # 返回拆解结果
         return cache[action]
 
+    def get_individual_actions(self, state, agent):
+        """
+        根据状态 s 查询 agent 的已见个体动作
+        """
+        # 校验 agent 是否在 self.agent_names 中
+        if agent not in self.agent_names:
+            raise ValueError(f'Unknown agent: {agent}')
+
+        # 获取状态 s 对应的节点
+        node = self.get_node(state)
+        if node is None:
+            return []
+
+        actions = []
+        seen = set()
+        # 遍历所有子节点以收集 agent 的个体动作
+        for child in node.children:
+            # 排除虚拟动作
+            if child['action'] == 'action_virtual':
+                continue
+
+            # 拆解联合动作文本以获取 agent 的个体动作
+            parts = self._parse_joint(child['action'])
+            if parts is None:
+                continue
+            action = parts[agent]
+
+            # (去重) 若该个体动作尚未见过则添加到 actions 列表
+            if action not in seen:
+                seen.add(action)
+                actions.append(action)
+        return actions
+
+    def get_q_i(self, state, agent, individual_action):
+        """
+        获取 Q_i(s, a_i) 值
+        """
+        i = self.agent_names.index(agent)
+        key = (preprocess_state(state), individual_action.strip())
+        return self.q_tables[i].get(key)
+
     def get_q_tot(self, s, a):
         """
-        获取 Q_tot(s,a) = Σ_i Q_i(s, a_i)
+        获取 Q_tot(s,a) = Σ_i Q_i(s, a_i) 值
         """
         # 将联合动作文本拆成 {agent: 个体动作}
         pa = self._parse_joint(a)
