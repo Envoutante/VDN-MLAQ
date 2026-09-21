@@ -102,6 +102,8 @@ def main():
     llm = LLM_SOURCE
     epoch = None
     compare_q = False
+    exploration_mode = 'joint'
+    exploration_seed = 0
     i = 1
     while i < len(sys.argv):
         arg = sys.argv[i]
@@ -123,6 +125,14 @@ def main():
             epoch = arg.split("=")[1]
         elif arg == "--compare_q":
             compare_q = True
+        elif arg == '--exploration_mode' and i + 1 < len(sys.argv):
+            exploration_mode = sys.argv[i + 1]; i += 1
+        elif arg.startswith('--exploration_mode='):
+            exploration_mode = arg.split('=', 1)[1]
+        elif arg == '--exploration_seed' and i + 1 < len(sys.argv):
+            exploration_seed = int(sys.argv[i + 1]); i += 1
+        elif arg.startswith('--exploration_seed='):
+            exploration_seed = int(arg.split('=', 1)[1])
         i += 1
 
     project_root = os.path.dirname(os.path.abspath(__file__))
@@ -131,6 +141,10 @@ def main():
         epoch = "{}/{}".format(algo, datetime.now().strftime("%Y%m%d_%H%M"))
     else:
         algo = epoch.split("/")[0]
+    if exploration_mode not in ('joint', 'local_round_robin', 'local_random'):
+        raise ValueError(f'Unknown exploration mode: {exploration_mode}')
+    if exploration_mode != 'joint' and (algo != 'vdn-mlaq' or TASK not in ('sort_dialog', 'sandwich_dialog')):
+        raise ValueError('Local exploration requires vdn-mlaq and a dialog task')
     # data_root = data/<task>/<algo>/<YYYYMMDD_HHMM>
     data_root = os.path.join(project_root, "data", TASK, *epoch.split("/"))
     print(f"本批次输出目录: {data_root}")
@@ -145,6 +159,8 @@ def main():
         "--algo", algo,
         "--epoch", epoch,
         "--llm_source", llm,
+        '--exploration_mode', exploration_mode,
+        '--exploration_seed', str(exploration_seed),
         "--tsteps", str(TSTEPS),
         "--num_runs", str(NUM_RUNS),
         "--skip_display",
@@ -176,7 +192,9 @@ def main():
         result = subprocess.run(args, cwd=project_root)
         if result.returncode != 0:
             print(f"ERROR: optimal_steps={opt} failed with code {result.returncode}")
-            print(f"  Resume command: cd {project_root} && python run_benchmark.py --epoch {epoch}")
+            print(f"  Resume command: cd {project_root} && python run_benchmark.py --epoch {epoch} "
+                  f"--llm {llm} --exploration_mode {exploration_mode} --exploration_seed {exploration_seed} --max_opt {max_opt}"
+                  + (' --compare_q' if compare_q else ''))
             sys.exit(1)
 
         print(f"  optimal_steps = {opt} completed")

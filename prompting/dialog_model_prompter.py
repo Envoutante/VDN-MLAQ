@@ -1,5 +1,6 @@
 import os
 import json
+import random
 import copy
 import time
 import torch
@@ -60,7 +61,9 @@ class DialogModelPrompter:
             load: bool = False,
             skip_check_memory: bool = False,
             algo: str = "mlaq",     # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN（精确匹配 == 'vdn-mlaq'）
-            compare_q: bool = False  # 旁路记录两套 Q 与动作选择的一致性（见 tools/q_consistency.py）
+            compare_q: bool = False,  # 旁路记录两套 Q 与动作选择的一致性（见 tools/q_consistency.py）
+            exploration_mode: str = 'joint',
+            exploration_seed: int = 0
     ):
         self.max_tokens = max_tokens
         self.debug_mode = debug_mode
@@ -70,6 +73,14 @@ class DialogModelPrompter:
         self.robot_name_map = robot_name_map
         self.robot_agent_names = list(robot_name_map.values())
         self.algo = algo   # "mlaq"(值迭代) / "vdn-mlaq"(遍历式 VDN)
+        if exploration_mode not in ('joint', 'local_round_robin', 'local_random'):
+            raise ValueError(f'Unknown exploration mode: {exploration_mode}')
+        if exploration_mode != 'joint' and algo != 'vdn-mlaq':
+            raise ValueError('Local exploration requires algo=vdn-mlaq')
+        self.exploration_mode = exploration_mode
+        self.exploration_seed = exploration_seed
+        self.local_action_rng = random.Random(exploration_seed)
+        self.local_action_cursor = {}  # (状态, 基准联合动作) -> 下次轮换序号
         # 旁路记录器：只读树、不写节点属性，关闭时为 None（不产生任何开销）
         self.q_recorder = QConsistencyRecorder() if compare_q else None
         self.num_replans = num_replans
@@ -380,6 +391,7 @@ class DialogModelPrompter:
         self.temporary_memory = copy.deepcopy(self.memory)  # 重置临时 memory
 
     def case_reset(self):
+        self.local_action_cursor = {}
         self.interaction_failure = 0
         self.imagination_failure = 0
         self.env_replans = 0
@@ -1388,20 +1400,65 @@ class DialogModelPrompter:
 
     def predict_action(self, state_desp, forbidden_actions=None,
                         action_history=None, timestep=0):
-        """完整联合动作提案 + 检查，保留原重试策略；返回 (动作, 状态)。
-
-        不预测下一状态、不更新树。单轮提案由 get_llm_action 负责。
+        """
+        预测动作 a
         """
         forbidden_actions = forbidden_actions or []
         action_history = action_history or []
+
+        # 局部探索模式共用同一基准选择与重试流程
+        anchor_action, selected_agent = None, None
+        if self.exploration_mode in ('local_round_robin', 'local_random'):
+            node = self.lang_tree.get_node(state_desp)
+            if node is not None and any(
+                    self.lang_tree._parse_joint(child['action']) is not None
+                    for child in node.children):
+
+                # 根据永久树 Q 值选择最优动作作为基准联合动作
+                self.lang_tree.vdn_compute_q_values(self.env.target_state_desp)
+                self._qcompare(self.lang_tree, loop=self.lang_tree.q_loop)
+                anchor_action, _ = self.lang_tree.vdn_get_best(state_desp, without_virtual=True)
+
+                if anchor_action is not None:
+                    self._qrec(self.lang_tree, state_desp, 'imagine', anchor_action,
+                                site='local_anchor', without_virtual=True)
+                    if self.exploration_mode == 'local_random':
+                        selected_agent = self.local_action_rng.choice(self.robot_agent_names)
+                    else:
+                        key = (preprocess_state(state_desp), anchor_action)
+                        cursor = self.local_action_cursor.get(key, 0)
+                        selected_agent = self.robot_agent_names[cursor % len(self.robot_agent_names)]
+                        self.local_action_cursor[key] = cursor + 1
+                    self.log(f'[{self.exploration_mode}] seed={self.exploration_seed} agent={selected_agent}\nanchor:\n{anchor_action}')
+
+            # 若找不出基准联合动作，则让 LLM 直接预测联合动作
+            if anchor_action is None:
+                self.log(f'[{self.exploration_mode}] No anchor; use joint proposal.')
+
+        excluded_actions = []  # 仅限本次固定基准下被拒绝的个体动作
         action, feedbacks = None, []
         trial, action_success = 0, False
 
         # 获取动作 a
         while trial < 3:  # 最多尝试 3 次
             # 调用 LLM 预测动作 a
-            action, _ = self.get_llm_action(state_desp, feedbacks, forbidden_actions, action_history,
-                                            timestep+1, trial+1)
+            if anchor_action is not None:
+                action, _ = self.get_llm_local_action(
+                    state_desp, anchor_action, selected_agent,
+                    excluded_actions=excluded_actions, feedbacks=feedbacks,
+                    timestep=timestep+1, trial_id=trial+1)
+                if action is None:
+                    self.log('----- Local proposal invalid or repeated; retry -----')
+                    trial += 1
+                    continue
+                if preprocess_action(action) in {preprocess_action(a) for a in forbidden_actions}:
+                    feedbacks.append({'action': action, 'feedback': 'This joint action is forbidden.'})
+                    excluded_actions.append(self.lang_tree._parse_joint(action)[selected_agent])
+                    trial += 1
+                    continue
+            else:
+                action, _ = self.get_llm_action(state_desp, feedbacks, forbidden_actions, action_history,
+                                                timestep+1, trial+1)
             action = action.replace('Error', 'ERROR')
 
             if 'ERROR' in action:  # 若直接预测出错
@@ -1412,11 +1469,17 @@ class DialogModelPrompter:
                     break
                 else:  # 若动作不合理则记录错误反馈并重新尝试预测动作
                     feedbacks.append(feedback)
-                    trial += 1 if len(forbidden_actions) == 0 else 2
+                    if anchor_action is not None:
+                        excluded_actions.append(self.lang_tree._parse_joint(action)[selected_agent])
+                        trial += 1
+                    else:
+                        trial += 1 if len(forbidden_actions) == 0 else 2
                     self.log('----- Re-plan the action -----')
 
         # (兜底) 若尝试次数达到上限但动作 a 仍不合理，则直接返回
         if not action_success:
+            if anchor_action is not None:
+                return None, 'action_failed'  # 单人没提出动作不代表状态无解/动作穷尽
             if len(forbidden_actions) == 0:
                 if 'ERROR' in action:
                     return None, 'failure'
@@ -1448,6 +1511,7 @@ class DialogModelPrompter:
 
         return action, agent_responses
 
+    @staticmethod
     def _parse_individual_proposal(response, agent):
         """
         根据指定 agent 的一行 NAME ... ACTION ... 解析个体动作
@@ -1471,6 +1535,7 @@ class DialogModelPrompter:
         # 返回指定 agent 的个体动作
         return parts[agent]
 
+    @staticmethod
     def _build_local_joint_action(anchor_action, agent, individual_action, agent_names):
         """
         只替换基准联合动作中指定 agent 对应的个体动作
@@ -1500,8 +1565,8 @@ class DialogModelPrompter:
             raise ValueError('Expected an individual action, not a joint action or ERROR')
         parts[agent] = action
 
-        # 返回新的联合动作
-        return preprocess_action('\n'.join(
+        # 返回新的联合动作 EXECUTE + 每个 agent 的 NAME ... ACTION ... 行
+        return preprocess_action('EXECUTE\n' + '\n'.join(
             f'NAME {name} ACTION {parts[name]}' for name in agent_names))
 
     def get_llm_local_action(self, state, anchor_action, agent,

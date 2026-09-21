@@ -61,8 +61,14 @@ class LLMRunner:
             tree_load: bool = False,
             skip_check_memory: bool = False,
             algo: str = "mlaq",     # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN
-            compare_q: bool = False  # 旁路记录两套 Q 与动作选择的一致性
+            compare_q: bool = False,  # 旁路记录两套 Q 与动作选择的一致性
+            exploration_mode: str = 'joint',
+            exploration_seed: int = 0
     ):
+        if exploration_mode not in ('joint', 'local_round_robin', 'local_random'):
+            raise ValueError(f'Unknown exploration mode: {exploration_mode}')
+        if exploration_mode != 'joint' and (algo != 'vdn-mlaq' or 'dialog' not in env.name):
+            raise ValueError('Local exploration requires vdn-mlaq and a dialog task')
         self.env = env
         self.env.reset()
         self.robots = robots
@@ -71,6 +77,8 @@ class LLMRunner:
         self.run_name = run_name
         self.algo = algo   # 透传给 prompter：mlaq / vdn
         self.compare_q = compare_q
+        self.exploration_mode = exploration_mode
+        self.exploration_seed = exploration_seed
 
         # NOTE: the run directory is data/env_name, or data/env_name/<epoch_id> (epoch_id = "<算法>/<YYYYMMDD_HHMM>")
         run_dir = exp_output_dir(self.env.name, epoch_id, self.data_dir)
@@ -148,7 +156,9 @@ class LLMRunner:
                 load=self.tree_load,
                 skip_check_memory=skip_check_memory,
                 algo=self.algo,
-                compare_q=self.compare_q
+                compare_q=self.compare_q,
+                exploration_mode=exploration_mode,
+                exploration_seed=exploration_seed
             )
         else:
             self.prompter = ModelPrompter(
@@ -453,6 +463,10 @@ class LLMRunner:
             print(f"============ Case {case_id} starts ============")
             self.episode_id = 0
             self.prompter.case_reset()
+            if self.exploration_mode == 'local_random':
+                case_seed = f'{self.exploration_seed}:{start_id}:{case_id}'
+                self.prompter.local_action_rng.seed(case_seed)
+                print(f'[local_random] case_seed={case_seed}')
             try:
                 self.one_run_with_model(case_id)
             except LLMQuotaExceeded as qe:
@@ -462,7 +476,8 @@ class LLMRunner:
                 print(f"\n[quota] {qe}")
                 print(f"本批次输出目录: {self.run_dir}")
                 print("额度恢复后用以下命令续跑（断点恢复，已完成的 case 不会重跑）：")
-                print(f"    python run_benchmark.py --epoch {epoch}")
+                print(f"    python run_benchmark.py --epoch {epoch} --llm {self.prompter.llm_source} "
+                      f"--exploration_mode {self.exploration_mode} --exploration_seed {self.exploration_seed}" + (' --compare_q' if self.compare_q else ''))
                 sys.exit(1)
             finally:
                 # case 收尾：写本 case 的 Q 一致性表（--compare_q 关闭时为空操作）
