@@ -1592,10 +1592,11 @@ class DialogModelPrompter:
 
         # 追加要求单行输出
         system_prompt += (
-            '\n[Local Exploration Mode]\n'
+            '[Local Exploration Mode]\n'
             'This call proposes only one individual action, not a group dialogue. '
             'The single-line output contract below replaces the usual dialogue '
             'and EXECUTE/PROCEED output format. Keep all other agents fixed.\n'
+            '\n'
         )
 
         # 设置用户提示词
@@ -1604,7 +1605,9 @@ class DialogModelPrompter:
             f'[Target State]\n{self.env.target_state_desp}\n'
             f'[Anchor Joint Action]\n{anchor_action}\n'
             f'Only replace the action of {agent}. All other actions above are fixed.\n'
+            '\n'
             '[Excluded Individual Actions]\n' + '\n'.join(sorted(excluded)) + '\n'
+            '\n'
             'Propose an untried individual action compatible with the fixed actions '
             'and task rules. Consider helping the team, not only your own progress. '
             'Do not repeat an excluded action.\n'
