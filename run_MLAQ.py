@@ -94,9 +94,6 @@ def _setup_llm_api(llm_source):
 
 
 def main(args):
-    if args.exploration_mode != 'joint' and (
-            args.algo != 'vdn-mlaq' or args.task not in ('sort_dialog', 'sandwich_dialog')):
-        raise ValueError('Local exploration requires vdn-mlaq and a dialog task')
     _setup_llm_api(args.llm_source)   # 按 --llm_source 载入对应模型的 key/base
     # 本次实验的输出标识: <算法>/<YYYYMMDD_HHMM>，落到 data/<task>/<epoch_id> 下
     # 每次启动自动追加分钟时间戳，避免不同算法/批次互相覆盖。
@@ -168,8 +165,6 @@ def main(args):
             skip_check_memory=args.skip_check_memory,
             algo=args.algo,   # algo 名选择：mlaq=值迭代 / vdn-mlaq=遍历式 VDN
             compare_q=args.compare_q,   # 旁路记录两套 Q 与动作选择的一致性（每个 case 一个 excel）
-            exploration_mode=args.exploration_mode,
-            exploration_seed=args.exploration_seed,
         )
 
         # 运行 runner
@@ -213,10 +208,6 @@ if __name__ == "__main__":
     # special parameters in LAQ
     parser.add_argument("--data_dir", "-d", type=str, default="data")
     parser.add_argument("--algo", type=str, default="mlaq", help="算法标签，输出落在 data/<task>/<algo>/<时间>/ 下，用于区分不同算法")
-    parser.add_argument('--exploration_mode', choices=['joint', 'local_round_robin', 'local_random'], default='joint',
-                        help='joint=原联合动作提案；local_round_robin=轮换单人扩展；local_random=随机单人扩展')
-    parser.add_argument('--exploration_seed', type=int, default=0,
-                        help='局部随机选人的独立种子；按 run/case 派生，不影响环境随机数')
     parser.add_argument("--epoch", type=str, default="", help="显式指定批次标识（如 mlaq/20260729_1906），覆盖自动时间戳；供 run_benchmark 等多阶段续跑固定同一批次")
     parser.add_argument("--task", type=str, default="sandwich_dialog")  # "sandwich_dialog", "sort_dialog", "sandwich_central", "sort_central", "blocksworld"
     parser.add_argument("--start_run_id", "-sri", type=int, default=0)

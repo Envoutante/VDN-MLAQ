@@ -1,6 +1,5 @@
 import os
 import json
-import random
 import copy
 import time
 import torch
@@ -11,7 +10,7 @@ import os.path as path
 from typing import Dict
 from datetime import datetime
 
-from prompting.lang_tree import LangTree, preprocess_state, preprocess_action, parse_joint_action
+from prompting.lang_tree import LangTree, preprocess_state, preprocess_action
 from prompting.paths import exp_output_dir
 from tools.minimax_quota import handle_api_error
 from tools.q_consistency import QConsistencyRecorder
@@ -62,8 +61,6 @@ class DialogModelPrompter:
             skip_check_memory: bool = False,
             algo: str = "mlaq",     # "mlaq"=值迭代 / "vdn-mlaq"=遍历式 VDN（精确匹配 == 'vdn-mlaq'）
             compare_q: bool = False,  # 旁路记录两套 Q 与动作选择的一致性（见 tools/q_consistency.py）
-            exploration_mode: str = 'joint',
-            exploration_seed: int = 0
     ):
         self.max_tokens = max_tokens
         self.debug_mode = debug_mode
@@ -73,14 +70,6 @@ class DialogModelPrompter:
         self.robot_name_map = robot_name_map
         self.robot_agent_names = list(robot_name_map.values())
         self.algo = algo   # "mlaq"(值迭代) / "vdn-mlaq"(遍历式 VDN)
-        if exploration_mode not in ('joint', 'local_round_robin', 'local_random'):
-            raise ValueError(f'Unknown exploration mode: {exploration_mode}')
-        if exploration_mode != 'joint' and algo != 'vdn-mlaq':
-            raise ValueError('Local exploration requires algo=vdn-mlaq')
-        self.exploration_mode = exploration_mode
-        self.exploration_seed = exploration_seed
-        self.local_action_rng = random.Random(exploration_seed)
-        self.local_action_cursor = {}  # (状态, 基准联合动作) -> 下次轮换序号
         # 旁路记录器：只读树、不写节点属性，关闭时为 None（不产生任何开销）
         self.q_recorder = QConsistencyRecorder() if compare_q else None
         self.num_replans = num_replans
@@ -391,7 +380,6 @@ class DialogModelPrompter:
         self.temporary_memory = copy.deepcopy(self.memory)  # 重置临时 memory
 
     def case_reset(self):
-        self.local_action_cursor = {}
         self.interaction_failure = 0
         self.imagination_failure = 0
         self.env_replans = 0
@@ -1370,7 +1358,7 @@ class DialogModelPrompter:
             state_desp, forbidden_actions or [], action_history or [], timestep)
         if status != 'success':
             if status == 'failure':
-                # 保留原完整联合提案的 ERROR 行为；不用于局部提案失败。
+                # 保留原完整联合提案的 ERROR 行为。
                 self.temp_lang_tree.update(transition=[state_desp, 'ERROR', 'Failure'])
             return {'transition': None, 'imagine_info': status}
         action = preprocess_action(action)
@@ -1406,59 +1394,14 @@ class DialogModelPrompter:
         forbidden_actions = forbidden_actions or []
         action_history = action_history or []
 
-        # 局部探索模式共用同一基准选择与重试流程
-        anchor_action, selected_agent = None, None
-        if self.exploration_mode in ('local_round_robin', 'local_random'):
-            node = self.lang_tree.get_node(state_desp)
-            if node is not None and any(
-                    self.lang_tree._parse_joint(child['action']) is not None
-                    for child in node.children):
-
-                # 根据永久树 Q 值选择最优动作作为基准联合动作
-                self.lang_tree.vdn_compute_q_values(self.env.target_state_desp)
-                self._qcompare(self.lang_tree, loop=self.lang_tree.q_loop)
-                anchor_action, _ = self.lang_tree.vdn_get_best(state_desp, without_virtual=True)
-
-                if anchor_action is not None:
-                    self._qrec(self.lang_tree, state_desp, 'imagine', anchor_action,
-                                site='local_anchor', without_virtual=True)
-                    if self.exploration_mode == 'local_random':
-                        selected_agent = self.local_action_rng.choice(self.robot_agent_names)
-                    else:
-                        key = (preprocess_state(state_desp), anchor_action)
-                        cursor = self.local_action_cursor.get(key, 0)
-                        selected_agent = self.robot_agent_names[cursor % len(self.robot_agent_names)]
-                        self.local_action_cursor[key] = cursor + 1
-                    self.log(f'[{self.exploration_mode}] seed={self.exploration_seed} agent={selected_agent}\nanchor:\n{anchor_action}')
-
-            # 若找不出基准联合动作，则让 LLM 直接预测联合动作
-            if anchor_action is None:
-                self.log(f'[{self.exploration_mode}] No anchor; use joint proposal.')
-
-        excluded_actions = []  # 仅限本次固定基准下被拒绝的个体动作
         action, feedbacks = None, []
         trial, action_success = 0, False
 
         # 获取动作 a
         while trial < 3:  # 最多尝试 3 次
             # 调用 LLM 预测动作 a
-            if anchor_action is not None:
-                action, _ = self.get_llm_local_action(
-                    state_desp, anchor_action, selected_agent,
-                    excluded_actions=excluded_actions, feedbacks=feedbacks,
-                    timestep=timestep+1, trial_id=trial+1)
-                if action is None:
-                    self.log('----- Local proposal invalid or repeated; retry -----')
-                    trial += 1
-                    continue
-                if preprocess_action(action) in {preprocess_action(a) for a in forbidden_actions}:
-                    feedbacks.append({'action': action, 'feedback': 'This joint action is forbidden.'})
-                    excluded_actions.append(self.lang_tree._parse_joint(action)[selected_agent])
-                    trial += 1
-                    continue
-            else:
-                action, _ = self.get_llm_action(state_desp, feedbacks, forbidden_actions, action_history,
-                                                timestep+1, trial+1)
+            action, _ = self.get_llm_action(state_desp, feedbacks, forbidden_actions, action_history,
+                                            timestep+1, trial+1)
             action = action.replace('Error', 'ERROR')
 
             if 'ERROR' in action:  # 若直接预测出错
@@ -1469,17 +1412,11 @@ class DialogModelPrompter:
                     break
                 else:  # 若动作不合理则记录错误反馈并重新尝试预测动作
                     feedbacks.append(feedback)
-                    if anchor_action is not None:
-                        excluded_actions.append(self.lang_tree._parse_joint(action)[selected_agent])
-                        trial += 1
-                    else:
-                        trial += 1 if len(forbidden_actions) == 0 else 2
+                    trial += 1 if len(forbidden_actions) == 0 else 2
                     self.log('----- Re-plan the action -----')
 
         # (兜底) 若尝试次数达到上限但动作 a 仍不合理，则直接返回
         if not action_success:
-            if anchor_action is not None:
-                return None, 'action_failed'  # 单人没提出动作不代表状态无解/动作穷尽
             if len(forbidden_actions) == 0:
                 if 'ERROR' in action:
                     return None, 'failure'
@@ -1510,133 +1447,6 @@ class DialogModelPrompter:
         action = self.env.process_action(final_response)
 
         return action, agent_responses
-
-    @staticmethod
-    def _parse_individual_proposal(response, agent):
-        """
-        根据指定 agent 的一行 NAME ... ACTION ... 解析个体动作
-        """
-        # 要求 LLM 的回复是字符串格式
-        if not isinstance(response, str):
-            return None
-
-        # 去掉首尾空白后按行切开
-        lines = response.strip().splitlines()
-
-        # 必须正好一行，且行首是 NAME {agent} ACTION 这个固定前缀
-        if len(lines) != 1 or not lines[0].startswith(f'NAME {agent} ACTION '):
-            return None
-
-        # 解析该行以得到 {agent: 动作} 的字典
-        parts = parse_joint_action(lines[0], [agent])
-        if parts is None or not parts[agent] or parts[agent] == 'ERROR':
-            return None
-
-        # 返回指定 agent 的个体动作
-        return parts[agent]
-
-    @staticmethod
-    def _build_local_joint_action(anchor_action, agent, individual_action, agent_names):
-        """
-        只替换基准联合动作中指定 agent 对应的个体动作
-        返回新的联合动作
-        """
-        if agent not in agent_names:
-            raise ValueError(f'Unknown agent: {agent}')
-
-        # 解析基准联合动作以得到 {agent: 动作}
-        parts = parse_joint_action(anchor_action, agent_names)
-
-        # 提取实际的动作行，排除空行和 EXECUTE
-        lines = [line for line in anchor_action.splitlines()
-                    if line.strip() and line.strip() != 'EXECUTE']
-
-        # 校验基准联合动作的格式
-        if parts is None or len(lines) != len(agent_names) or any(not a for a in parts.values()):
-            raise ValueError('Invalid anchor joint action')
-
-        # 校验个体动作的格式
-        if not isinstance(individual_action, str) or len(individual_action.strip().splitlines()) != 1:
-            raise ValueError('Individual action must be one non-empty line')
-
-        # 提取新的个体动作
-        action = individual_action.strip()
-        if action == 'ERROR' or 'NAME ' in action or 'ACTION ' in action:
-            raise ValueError('Expected an individual action, not a joint action or ERROR')
-        parts[agent] = action
-
-        # 返回新的联合动作 EXECUTE + 每个 agent 的 NAME ... ACTION ... 行
-        return preprocess_action('EXECUTE\n' + '\n'.join(
-            f'NAME {name} ACTION {parts[name]}' for name in agent_names))
-
-    def get_llm_local_action(self, state, anchor_action, agent,
-                                    excluded_actions=None, feedbacks=None,
-                                    timestep=0, trial_id=0):
-        """
-        调用 LLM 获取单 agent 的个体动作，返回 (联合动作或 None, 原始回复)
-        """
-        # 校验基准联合动作是否合法
-        self._build_local_joint_action(anchor_action, agent, 'WAIT', self.robot_agent_names)
-
-        # 从基准联合动作中获取 agent 当前的个体动作
-        parts = self.lang_tree._parse_joint(anchor_action)
-
-        # 排除状态 s 下 agent 当前的个体动作、已尝试过的动作、传入的 excluded_actions
-        excluded = set(self.lang_tree.get_individual_actions(state, agent))
-        excluded.update(a.strip() for a in (excluded_actions or []))
-        excluded.add(parts[agent])
-
-        # 复用常规对话的系统提示词
-        system_prompt = self.compose_system_prompt(
-            state, agent, feedback_history=feedbacks or [])
-
-        # 追加要求单行输出
-        system_prompt += (
-            '[Local Exploration Mode]\n'
-            'This call proposes only one individual action, not a group dialogue. '
-            'The single-line output contract below replaces the usual dialogue '
-            'and EXECUTE/PROCEED output format. Keep all other agents fixed.\n'
-            '\n'
-        )
-
-        # 设置用户提示词
-        user_prompt = (
-            f'[Current State]\n{state}\n'
-            f'[Target State]\n{self.env.target_state_desp}\n'
-            f'[Anchor Joint Action]\n{anchor_action}\n'
-            f'Only replace the action of {agent}. All other actions above are fixed.\n'
-            '\n'
-            '[Excluded Individual Actions]\n' + '\n'.join(sorted(excluded)) + '\n'
-            '\n'
-            'Propose an untried individual action compatible with the fixed actions '
-            'and task rules. Consider helping the team, not only your own progress. '
-            'Do not repeat an excluded action.\n'
-            f'Output exactly one line: NAME {agent} ACTION <individual action>\n'
-            'No explanation, code fences, EXECUTE, PROCEED, or other agents. '
-            'If you cannot propose one, output exactly ERROR.\n'
-        )
-
-        # 调用 LLM 获取指定 agent 的个体动作
-        response = self.new_query_once(
-            prompt={'system_prompt': system_prompt, 'user_prompt': user_prompt},
-            use_stream=True,
-            info={'role': agent + '_local', 'timestep': timestep,
-                    'id': trial_id, 'property': 'main'})
-
-        # 解析 LLM 的回复以提取指定 agent 的个体动作
-        action = self._parse_individual_proposal(response, agent)
-        if action is None or action in excluded:
-            return None, response
-
-        # 尝试构建新的联合动作
-        try:
-            joint_action = self._build_local_joint_action(
-                anchor_action, agent, action, self.robot_agent_names)
-        except ValueError:
-            return None, response
-
-        # 返回新的联合动作和原始回复
-        return joint_action, response
 
     def predict_next_state(self, state: str, action: str, timestep=0):
         """
