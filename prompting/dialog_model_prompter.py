@@ -10,7 +10,7 @@ import os.path as path
 from typing import Dict
 from datetime import datetime
 
-from prompting.lang_tree import LangTree, preprocess_state, preprocess_action
+from prompting.lang_tree import LangTree, preprocess_state, preprocess_action, parse_joint_action
 from prompting.paths import exp_output_dir
 from tools.minimax_quota import handle_api_error
 from tools.q_consistency import QConsistencyRecorder
@@ -139,9 +139,10 @@ class DialogModelPrompter:
             if_temp_tree=False,
             tree_path=path.join(exp_output_dir(self.env.name, epoch_id, data_dir), 'lang_tree.pth'),
             agent_names=self.robot_agent_names,
+            algo=self.algo,
         )
 
-        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, agent_names=self.robot_agent_names)
+        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, agent_names=self.robot_agent_names, algo=self.algo)
         self.case_dir, self.simulate_save_dir, self.interact_save_dir = None, None, None
         self.round_save_dir, self.env_round_save_dir = None, None
         self.round_index = 1
@@ -219,14 +220,26 @@ class DialogModelPrompter:
         self._qcompare(lang_tree, owner=self.lang_tree, loop=10)
         return state_node.value > 0.5
 
+    def _build_temp_virtual_node(self, state_desp):
+        """VDN 的目标/失败状态不提供新的全局或个体想象入口。"""
+        if self.algo == 'vdn-mlaq':
+            state = preprocess_state(state_desp)
+            if (state in (preprocess_state(self.env.target_state_desp),
+                          preprocess_state('Success'), preprocess_state('Failure'))
+                    or self.env.if_fail(state_desp)):
+                self.temp_lang_tree.build_node(state_desp)
+                self.temp_lang_tree.remove_node(state_desp, 'action_virtual', virtual=True)
+                return
+        self.temp_lang_tree.build_virtual_node(state_desp)
+
     def initial_temp_lang_tree(self, state_desp, target_state_desp):
         """
         初始化临时语言树
         检查永久树中是否存在最优轨迹，若有则在临时树里添加，并计算 UCB 值
         """
-        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, agent_names=self.robot_agent_names)  # 创建临时语言树
+        self.temp_lang_tree = LangTree(load=False, if_temp_tree=True, agent_names=self.robot_agent_names, algo=self.algo)  # 创建临时语言树
 
-        self.temp_lang_tree.build_virtual_node(state_desp)  # 为初始状态节点创建虚拟子节点
+        self._build_temp_virtual_node(state_desp)  # 为初始状态节点创建虚拟子节点
         self.temp_lang_tree.get_node(state_desp).visit_num += 1
 
         # 判断是否存在最优轨迹
@@ -242,18 +255,25 @@ class DialogModelPrompter:
             self._qcompare(self.lang_tree)
 
             # 把永久树上的最优轨迹复制到临时树上
-            reach_target = False
+            reach_target = self.algo == 'vdn-mlaq' and preprocess_state(state_desp) == preprocess_state(target_state_desp)
+            visited_states = set() if self.algo == 'vdn-mlaq' else None
             while not reach_target:
                 state_node = self.lang_tree.get_node(preprocess_state(state_desp))  # 在永久树上找到初始状态对应的节点
+                if self.algo == 'vdn-mlaq' and (state_node is None or state_node.state in visited_states):
+                    break
+                if self.algo == 'vdn-mlaq':
+                    visited_states.add(state_node.state)
                 if self.algo == 'vdn-mlaq':
                     action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 else:
                     action, next_state_node = state_node.get_best()
+                if self.algo == 'vdn-mlaq' and next_state_node is None:
+                    break
                 self._qrec(self.lang_tree, state_node.state, 'imagine', action)
 
                 # 把 (s, a, s') 复制到临时树上
                 self.temp_lang_tree.update(transition=[state_node.state, action, next_state_node.state])  # 把 (s, a, s') 加入到临时树上
-                self.temp_lang_tree.build_virtual_node(next_state_node.state)  # 为 s' 创建虚拟子节点
+                self._build_temp_virtual_node(next_state_node.state)  # 为 s' 创建虚拟子节点
                 self.temp_lang_tree.get_node(next_state_node.state).visit_num += 1
 
                 state_desp = next_state_node.state  # 指针移动到下一节点
@@ -273,13 +293,15 @@ class DialogModelPrompter:
             else:
                 self.temp_lang_tree.compute_ucb_values(loop=20)
             self._qcompare(self.temp_lang_tree, ucb=True)
+        elif self.algo == 'vdn-mlaq':
+            self.temp_lang_tree.vdn_compute_ucb_values(target_state_desp)
 
     def fill_temp_lang_tree(self, state_desp, target_state_desp):
         """
         填充临时语言树
         检查永久树中是否存在新发现的最优轨迹，若有则在临时树里覆盖或添加，并刷新 UCB 值
         """
-        self.temp_lang_tree.build_virtual_node(state_desp)
+        self._build_temp_virtual_node(state_desp)
         # 若对临时树中来说是新节点，则将其 visit_num 置为 1
         if self.temp_lang_tree.get_node(state_desp).visit_num == 0:
             self.temp_lang_tree.get_node(state_desp).visit_num = 1
@@ -297,17 +319,24 @@ class DialogModelPrompter:
             self._qcompare(self.lang_tree)
 
             # 把永久树上的最优轨迹复制到临时树上
-            reach_target = False
+            reach_target = self.algo == 'vdn-mlaq' and preprocess_state(state_desp) == preprocess_state(target_state_desp)
+            visited_states = set() if self.algo == 'vdn-mlaq' else None
             while not reach_target:
                 state_node = self.lang_tree.get_node(preprocess_state(state_desp))  # 在永久树上找到当前状态对应的节点
+                if self.algo == 'vdn-mlaq' and (state_node is None or state_node.state in visited_states):
+                    break
+                if self.algo == 'vdn-mlaq':
+                    visited_states.add(state_node.state)
                 if self.algo == 'vdn-mlaq':
                     action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 else:
                     action, next_state_node = state_node.get_best()
+                if self.algo == 'vdn-mlaq' and next_state_node is None:
+                    break
                 self._qrec(self.lang_tree, state_node.state, 'imagine', action)
 
                 self.temp_lang_tree.update(transition=[state_node.state, action, next_state_node.state])  # 把 (s, a, s') 加入到临时树上
-                self.temp_lang_tree.build_virtual_node(next_state_node.state)  # 为 s' 创建虚拟子节点
+                self._build_temp_virtual_node(next_state_node.state)  # 为 s' 创建虚拟子节点
 
                 # 若对临时树中来说是新节点，则将其 visit_num 置为 1
                 if self.temp_lang_tree.get_node(state_node.state).visit_num == 0:
@@ -345,7 +374,7 @@ class DialogModelPrompter:
         计算最优轨迹的步数，若不存在最优轨迹则返回 100
         仅用于效率评估
         """
-        self.temp_lang_tree.build_virtual_node(self.state_desp)
+        self._build_temp_virtual_node(self.state_desp)
         path_exist = self.check_path_exist(self.state_desp, target_state_desp=target_state_desp)
         end_step = 0
         if path_exist:
@@ -356,12 +385,21 @@ class DialogModelPrompter:
             self._qcompare(self.lang_tree)
             reach_target = False
             state_desp = self.state_desp
+            if self.algo == 'vdn-mlaq' and preprocess_state(state_desp) == preprocess_state(target_state_desp):
+                return 0
+            visited_states = set() if self.algo == 'vdn-mlaq' else None
             while not reach_target:
                 state_node = self.lang_tree.get_node(preprocess_state(state_desp))
+                if self.algo == 'vdn-mlaq' and (state_node is None or state_node.state in visited_states):
+                    return 100
+                if self.algo == 'vdn-mlaq':
+                    visited_states.add(state_node.state)
                 if self.algo == 'vdn-mlaq':
                     action, next_state_node = self.lang_tree.vdn_get_best(state_node.state)
                 else:
                     action, next_state_node = state_node.get_best()
+                if self.algo == 'vdn-mlaq' and next_state_node is None:
+                    return 100
                 self._qrec(self.lang_tree, state_node.state, 'evaluation', action)
                 end_step += 1
                 state_desp = next_state_node.state
@@ -370,9 +408,9 @@ class DialogModelPrompter:
                     reach_target = True
 
         if end_step == 0:
-            end_step = 100
-        else:
-            return end_step
+            # MLAQ 保留原先无路径时隐式返回 None 的行为。
+            return 100 if self.algo == 'vdn-mlaq' else None
+        return end_step
 
     def round_reset(self):
         self.state = None
@@ -597,7 +635,9 @@ class DialogModelPrompter:
 
         return {'system_prompt': system_prompt, 'user_prompt': user_prompt}
 
-    def get_forbidden_action_prompt(self, agent: str, forbidden_actions: list):
+    def get_forbidden_action_prompt(self, agent: str, forbidden_actions: list, fixed_actions=None):
+        if fixed_actions is not None and self.algo != 'vdn-mlaq':
+            raise ValueError('Fixed-agent dialogue requires algo="vdn-mlaq"')
         prompt = '[Forbidden Actions]\n'
         if len(forbidden_actions) == 0:
             prompt += 'No forbidden actions.'
@@ -625,8 +665,14 @@ class DialogModelPrompter:
 
                 prompt += f' simultaneously! Then, you cannot choose {action_dict[agent]}.\n'
 
+        if fixed_actions:
+            prompt += (
+                '1. Choose a joint action outside the list above. Only participating agents may '
+                'change their actions; all actions in [Fixed Actions] must remain unchanged.\n'
+            )
+        else:
+            prompt += '1. You should try your best to output an action that is not in the list above. However, if you insist on choosing a forbidden action, you can persuade other agents to modify their actions, but you need to pay attention to whether there is still an available action\n'
         prompt += (
-            '1. You should try your best to output an action that is not in the list above. However, if you insist on choosing a forbidden action, you can persuade other agents to modify their actions, but you need to pay attention to whether there is still an available action\n'
             '2. IMPORTANT: If there is no available action after 2 rounds of chat with other agents, you need to output an [ERROR]!!\n'
         )
 
@@ -678,11 +724,15 @@ class DialogModelPrompter:
             forbidden_actions = [],
             chat_history = [],  # chat from previous replan rounds
             current_chat = [],  # chat from current round, this comes AFTER env feedback
-            feedback_history = []
+            feedback_history = [],
+            active_agents=None,
+            fixed_actions=None
     ) -> str:
         """
         组装系统提示词
         """
+        if active_agents is not None or fixed_actions is not None:
+            active_agents, fixed_actions = self._get_dialog_agents(active_agents, fixed_actions)
         # 获取动作空间描述
         action_desp = self.env.get_action_prompt()
         # 若使用中间路径点则需加入路径规划指令
@@ -719,8 +769,25 @@ class DialogModelPrompter:
 
         # 设置禁用动作作为提示词
         if len(forbidden_actions) > 0:
-            forbidden_action_prompt = self.get_forbidden_action_prompt(agent_name, forbidden_actions)
+            forbidden_action_prompt = self.get_forbidden_action_prompt(agent_name, forbidden_actions, fixed_actions)
             system_prompt += forbidden_action_prompt
+
+        if active_agents is not None:
+            system_prompt += (
+                '[Participating Agents]\n' + ', '.join(active_agents) + '\n'
+                'Only these agents take turns discussing and choosing their actions.\n'
+                '[Fixed Actions]\n'
+            )
+            for name, action in (fixed_actions or {}).items():
+                system_prompt += f'NAME {name} ACTION {action}\n'
+            system_prompt += (
+                'Fixed agents do not speak. Do not change or ask to change their actions. '
+                'Coordinate your choices with these fixed actions.\n'
+                'For this round, dialogue order and approval requirements apply only to participating agents. '
+                'Fixed actions are already selected. Do not wait for a response or approval from fixed agents.\n'
+                'The final EXECUTE plan must contain exactly one action line for EVERY agent, '
+                'including every fixed action copied unchanged. Do not output only participating agents.\n'
+            )
 
         # 设置当前对话作为提示词
         if len(current_chat) > 0:
@@ -824,6 +891,43 @@ class DialogModelPrompter:
 
         return response
 
+    def _get_dialog_agents(self, active_agents=None, fixed_actions=None):
+        """校验参与者与固定动作覆盖全部 agent，并按原有发言顺序排列。"""
+        if active_agents is None and fixed_actions is None:
+            return list(self.robot_agent_names), {}
+        if self.algo != 'vdn-mlaq':
+            raise ValueError('Fixed-agent dialogue requires algo="vdn-mlaq"')
+        if active_agents is None:
+            raise ValueError('active_agents is required when fixed_actions is provided')
+        active_agents = list(active_agents)
+        fixed_actions = dict(fixed_actions or {})
+        active_set = set(active_agents)
+        if not active_agents or len(active_set) != len(active_agents):
+            raise ValueError('active_agents must be nonempty and contain no duplicates')
+        if active_set & set(fixed_actions) or active_set | set(fixed_actions) != set(self.robot_agent_names):
+            raise ValueError('Participating and fixed agents must partition all agents')
+        if any(not isinstance(action, str) or not action.strip() or '\n' in action.strip()
+                or action.strip() == 'action_virtual' for action in fixed_actions.values()):
+            raise ValueError('Fixed actions must be concrete individual actions on one line')
+        if self.max_calls_per_round < len(active_agents):
+            raise ValueError('Dialogue budget must allow every participating agent to speak')
+        return ([agent for agent in self.robot_agent_names if agent in active_set],
+                {agent: fixed_actions[agent].strip() for agent in self.robot_agent_names if agent in fixed_actions})
+
+    def _check_dialog_action(self, action, fixed_actions):
+        """在环境自动补全动作前检查完整性与固定动作；返回错误说明或 None。"""
+        if self.algo != 'vdn-mlaq':
+            raise ValueError('Fixed-agent dialogue requires algo="vdn-mlaq"')
+        parts = parse_joint_action(action, self.robot_agent_names)
+        action_lines = [line for line in action.splitlines() if line.startswith('NAME ')]
+        if (parts is None or len(action_lines) != len(self.robot_agent_names)
+                or any(not value or value == 'action_virtual' for value in parts.values())):
+            return 'Output exactly one NAME ... ACTION ... line for every agent in the final EXECUTE plan.'
+        changed = [agent for agent, fixed in fixed_actions.items() if parts[agent] != fixed]
+        if changed:
+            return 'Keep the fixed actions unchanged for: ' + ', '.join(changed) + '.'
+        return None
+
     def prompt_one_dialog_round(
             self,
             obs,
@@ -831,22 +935,31 @@ class DialogModelPrompter:
             action_history=[],
             forbidden_actions=[],
             replan_idx=0,
-            timestep=0
+            timestep=0,
+            active_agents=None,
+            fixed_actions=None
     ):
         """
         多智能体协商得到联合动作
         持续提问直至输出 EXECUTE 或达到单轮最大调用次数上限
         """
+        selected_dialog = active_agents is not None or fixed_actions is not None
+        dialog_agents, fixed_actions = self._get_dialog_agents(active_agents, fixed_actions)
         chat_history = []
         agent_responses = []
         dialog_done = False
-        num_responses = {agent_name: 0 for agent_name in self.robot_agent_names}
+        num_responses = {agent_name: 0 for agent_name in dialog_agents}
+        if self.algo == 'vdn-mlaq':
+            agent_name, response = None, 'ERROR'
 
         # 循环调用多智能体
         n_calls = 0  # 调用 LLM 的次数
         while n_calls < self.max_calls_per_round:
             # 依次提问每个智能体
-            for agent_name in self.robot_agent_names:
+            for next_agent in dialog_agents:
+                if self.algo == 'vdn-mlaq' and n_calls >= self.max_calls_per_round:
+                    break
+                agent_name = next_agent
                 # 设置系统提示词
                 system_prompt = self.compose_system_prompt(
                     obs,
@@ -856,6 +969,8 @@ class DialogModelPrompter:
                     chat_history=chat_history,
                     current_chat=agent_responses,
                     feedback_history=feedback_history,
+                    active_agents=dialog_agents if selected_dialog else None,
+                    fixed_actions=fixed_actions if selected_dialog else None,
                 )
 
                 # 设置用户提示词
@@ -895,13 +1010,16 @@ class DialogModelPrompter:
                 if 'EXECUTE' in response:
                     # 要求第一轮对话 replan_idx = 0 时每个智能体都必须发言一次
                     # 重试 replan_idx > 0 时有智能体输出 EXECUTE 即可结束
-                    if replan_idx > 0 or all([v > 0 for v in num_responses.values()]):
+                    # 指定参与者时，每次尝试（包括重试）都要求所有参与者发言。
+                    if (not selected_dialog and replan_idx > 0) or all(v > 0 for v in num_responses.values()):
                         dialog_done = True
                         break
 
             if dialog_done:
                 break
 
+        if selected_dialog and not dialog_done:
+            response = 'ERROR'
         return agent_name, response, agent_responses
 
     """
@@ -970,6 +1088,11 @@ class DialogModelPrompter:
         """
         判断是否需要通过 LLM 想象来探索新轨迹
         """
+        if self.algo == 'vdn-mlaq':
+            node = self.temp_lang_tree.get_node(state_desp)
+            return node is None or not any(
+                parse_joint_action(child['action'], self.robot_agent_names) is not None
+                for child in node.children if child['action'] != 'action_virtual')
         result = False
         # if the current state is not in the temporary language tree
         if self.temp_lang_tree.get_node(state_desp) is None:  # 临时树中没有该状态节点
@@ -1005,6 +1128,9 @@ class DialogModelPrompter:
         trial = 0
         ready_to_execute, failed = False, False
         while not ready_to_execute:
+            if self.algo == 'vdn-mlaq' and trial >= self.num_replans:
+                self.log('Reached the environment-action replanning limit.', if_test=True)
+                return False, None, path_exist
             """
             --------------------------------------- 上一轮动作校验失败则尝试 LLM 想象探索 ---------------------------------------
             """
@@ -1015,6 +1141,8 @@ class DialogModelPrompter:
                     self.interaction_failure += 1
                     if self.interaction_failure > 3 or len(self.temp_lang_tree.nodes) > 40:
                         self.log("-------------- The temporary imagination fails more than 3 times. The decision process is terminated. --------------", if_test=True)
+                        if self.algo == 'vdn-mlaq':
+                            return False, None, path_exist
                         break
 
                 self.imagine_with_ucb(obs=obs, horizon=12, interrupt_flag=True)
@@ -1048,7 +1176,13 @@ class DialogModelPrompter:
                 else:
                     # 若不值得 LLM 想象探索则随便选一个动作
                     state_node = self.temp_lang_tree.get_node(state_desp)
-                    action = state_node.children[-1]['action']
+                    if self.algo == 'vdn-mlaq':
+                        action, _ = self.temp_lang_tree.vdn_get_best(state_desp, without_virtual=True)
+                        if action is None:
+                            self.log('No concrete joint action is available for environment execution.', if_test=True)
+                            return None, None, None
+                    else:
+                        action = state_node.children[-1]['action']
 
             """
             --------------------------------------- 通过环境检测动作是否合理 ---------------------------------------
@@ -1140,6 +1274,11 @@ class DialogModelPrompter:
         """
         initial_state_desp = self.env.get_state_prompt(obs)
         target_state_desp = self.env.target_state_desp
+        if self.algo == 'vdn-mlaq' and (
+                preprocess_state(initial_state_desp) in (preprocess_state(target_state_desp),
+                                                        preprocess_state('Success'), preprocess_state('Failure'))
+                or self.env.if_fail(initial_state_desp)):
+            return
         self.fill_temp_lang_tree(state_desp=initial_state_desp, target_state_desp=target_state_desp)
 
         stop_flag = False
@@ -1162,8 +1301,17 @@ class DialogModelPrompter:
             # 每次 LLM 想象都从初始状态开始
             state_desp = initial_state_desp
             self.temp_lang_tree.get_node(state_desp).visit_num += 1
+            # 图可能有环；horizon 仅限制 LLM 请求，另限纯记忆遍历避免死循环。
+            if self.algo == 'vdn-mlaq':
+                search_steps = 0
+                max_search_steps = max(1, horizon) * max(1, len(self.temp_lang_tree.nodes))
             # 从初始状态开始探索直至到达目标状态 或 LLM 调用达到最大次数上限
             while not final and llm_count < horizon:
+                if self.algo == 'vdn-mlaq' and search_steps >= max_search_steps:
+                    self.log('Reached the per-round graph traversal limit.')
+                    break
+                if self.algo == 'vdn-mlaq':
+                    search_steps += 1
                 self.log('---------- Time step {} ----------'.format(t))
 
                 """
@@ -1178,11 +1326,33 @@ class DialogModelPrompter:
                     action, best_child = state_node.get_best(with_ucb=True)  # 通过 UCB 选择最优动作和对应的子节点
                 self._qrec(self.temp_lang_tree, state_desp, 'imagine', action, ucb=True)
 
+                if self.algo == 'vdn-mlaq' and action is None:
+                    self.log('No available search edge at the current state.')
+                    self.imagination_failure += 1
+                    break
+
+                dialog_options = {}
+                if action == 'action_virtual':
+                    best_child.visit_num += 1  # 记录全局虚拟入口被选择，包括全员固定的情况。
+                    if self.algo == 'vdn-mlaq':
+                        anchor_action, active_agents = self.temp_lang_tree.select_imagination_agents(state_desp)
+                        anchor_parts = (parse_joint_action(anchor_action, self.robot_agent_names)
+                                        if anchor_action is not None else {})
+                        fixed_actions = {agent: anchor_parts[agent] for agent in self.robot_agent_names
+                                         if agent not in active_agents}
+                        self.log(f'Local UCB participants: {active_agents}; fixed actions: {fixed_actions}')
+                        if active_agents:
+                            dialog_options = dict(active_agents=active_agents, fixed_actions=fixed_actions)
+                        else:
+                            # 所有人选已知动作时沿基准继续，不强制选人、不消耗 LLM 请求。
+                            action = anchor_action
+                            best_child = state_node.get_child(action)
+                            self.log('All agents keep the anchor joint action; no LLM request.')
+
                 if action == 'action_virtual':
                     # 若选到虚拟子节点
                     self.log('----- Use LLM -----')
                     llm_count += 1
-                    best_child.visit_num += 1  # 虚拟子节点访问次数 + 1
 
                     # 禁用已知动作，即已探索过的动作
                     forbidden_actions = [
@@ -1192,7 +1362,8 @@ class DialogModelPrompter:
 
                     # 调用 LLM 想象动作 a 和下一状态 s'
                     imagine_results = self.imagine_transition(
-                        state_desp=state_desp, forbidden_actions=forbidden_actions, action_history=action_history, timestep=t
+                        state_desp=state_desp, forbidden_actions=forbidden_actions, action_history=action_history, timestep=t,
+                        **dialog_options
                     )
 
                     # imagine_results 包含 'transition' 和 'imagine_info'
@@ -1232,9 +1403,12 @@ class DialogModelPrompter:
                     child = state_node.get_child(action)
                     assert child is not None, f"child is None, action: {action}"
                     next_state_desp = child.state
+                    if self.algo == 'vdn-mlaq' and parse_joint_action(action, self.robot_agent_names) is not None:
+                        self.temp_lang_tree.add_joint_visit_num(state_desp, action)
                     # 根据下一状态 s' 判断是否到达目标状态
                     final = (preprocess_state(next_state_desp) == preprocess_state(target_state_desp))
-                    failed = (next_state_desp == preprocess_state('Failure'))
+                    failed = (next_state_desp == preprocess_state('Failure')
+                              or self.algo == 'vdn-mlaq' and self.env.if_fail(next_state_desp))
 
                 """
                 --------------------------------------- 判断内循环是终止还是继续 ---------------------------------------
@@ -1288,6 +1462,14 @@ class DialogModelPrompter:
         # summarize the token and memory ratio of this round
         # return if the test should be conducted after this round
 
+        if self.algo == 'vdn-mlaq':
+            # 无论本轮成功、失败或纯记忆遍历，都先记成本，避免提前停止漏记。
+            self.consumed_token['input_token'].append(self.temp_consumed_token['input_token'])
+            self.consumed_token['output_token'].append(self.temp_consumed_token['output_token'])
+            self.memory_ratio['llm_count'].append(self.temp_memory_ratio['llm_count'])
+            self.memory_ratio['memory_count'].append(self.temp_memory_ratio['memory_count'])
+            self.round_index += 1
+
         if len(self.temp_lang_tree.nodes) > 40:
             return True
 
@@ -1305,6 +1487,12 @@ class DialogModelPrompter:
 
         if interrupt_flag and path_exist:
             return True
+
+        if self.algo == 'vdn-mlaq':
+            # 全员固定仍改变次数，纯记忆轮可以继续；但同样服从轮数上限。
+            return (self.round_index >= 8 or path_exist and (
+                current_end_step <= self.env.optimal_steps
+                or optimized_flag and self.temp_consumed_token['input_token'] > 0))
 
         if self.temp_consumed_token['input_token'] == 0:
             # if the assumed token is 0, it means that the LLM has not been called in this round
@@ -1345,7 +1533,7 @@ class DialogModelPrompter:
                 return False
 
     def imagine_transition(self, state_desp: str, forbidden_actions=None,
-                            action_history=None, timestep=0):
+                            action_history=None, timestep=0, active_agents=None, fixed_actions=None):
         """
         想象一条转移
 
@@ -1353,9 +1541,18 @@ class DialogModelPrompter:
         2. predict_next_state：复用记忆，或预测下一状态、检查下一状态及重试
         3. 本函数统一更新树；预测函数不写树
         """
+        selected_dialog = active_agents is not None or fixed_actions is not None
+        dialog_options = {}
+        if selected_dialog:
+            active_agents, fixed_actions = self._get_dialog_agents(active_agents, fixed_actions)
+            self.temp_lang_tree.init_individual_actions(state_desp, with_virtual=True)
+            for agent in active_agents:
+                # 一次扩展请求记一次；内部最多三次提案重试，不按发言条数重复计数。
+                self.temp_lang_tree.add_individual_visit_num(state_desp, agent, 'action_virtual')
+            dialog_options = dict(active_agents=active_agents, fixed_actions=fixed_actions)
         # 预测动作 a
         action, status = self.predict_action(
-            state_desp, forbidden_actions or [], action_history or [], timestep)
+            state_desp, forbidden_actions or [], action_history or [], timestep, **dialog_options)
         if status != 'success':
             if status == 'failure':
                 # 保留原完整联合提案的 ERROR 行为。
@@ -1378,21 +1575,32 @@ class DialogModelPrompter:
             self.lang_tree.update(transition)
             self.temp_memory_ratio['llm_count'] += 1
 
-        if self.env.if_fail(next_state):
+        if selected_dialog:
+            # 只有得到转移才计具体动作一次；失败状态的已评价转移也保留供 TD 使用。
+            self.temp_lang_tree.update(transition)
+            self.temp_lang_tree.add_joint_visit_num(state_desp, action)
+        if self.env.if_fail(next_state) or (selected_dialog and preprocess_state(next_state) == preprocess_state('Failure')):
+            if selected_dialog:
+                self._build_temp_virtual_node(next_state)
             return {'transition': transition, 'imagine_info': 'failure'}
 
         # 写入临时树并挂上虚拟子节点
-        self.temp_lang_tree.update(transition)
-        self.temp_lang_tree.build_virtual_node(next_state)
+        if not selected_dialog:
+            self.temp_lang_tree.update(transition)
+        self._build_temp_virtual_node(next_state)
         return {'transition': transition, 'imagine_info': 'success'}
 
     def predict_action(self, state_desp, forbidden_actions=None,
-                        action_history=None, timestep=0):
+                        action_history=None, timestep=0, active_agents=None, fixed_actions=None):
         """
-        预测动作 a
+        预测并检查完整联合动作；可指定参与讨论的 agent 和其余固定个体动作。
+        指定参与者时最多尝试三次，固定动作约束在所有尝试中保持不变。
         """
         forbidden_actions = forbidden_actions or []
         action_history = action_history or []
+        selected_dialog = active_agents is not None or fixed_actions is not None
+        if selected_dialog:
+            active_agents, fixed_actions = self._get_dialog_agents(active_agents, fixed_actions)
 
         action, feedbacks = None, []
         trial, action_success = 0, False
@@ -1400,9 +1608,32 @@ class DialogModelPrompter:
         # 获取动作 a
         while trial < 3:  # 最多尝试 3 次
             # 调用 LLM 预测动作 a
+            dialog_options = dict(active_agents=active_agents, fixed_actions=fixed_actions) if selected_dialog else {}
             action, _ = self.get_llm_action(state_desp, feedbacks, forbidden_actions, action_history,
-                                            timestep+1, trial+1)
+                                            timestep+1, trial+1, **dialog_options)
             action = action.replace('Error', 'ERROR')
+
+            if selected_dialog:
+                # 先校验原始完整提案，避免环境补 WAIT 掩盖缺失动作。
+                error = self._check_dialog_action(action, fixed_actions)
+                if error is None:
+                    action = self.env.process_action(action)
+                    error = self._check_dialog_action(action, fixed_actions)
+                if error is None and preprocess_action(action) in {
+                    preprocess_action(forbidden) for forbidden in forbidden_actions
+                }:
+                    error = 'This joint action has already been explored. Choose a different joint action while preserving fixed actions.'
+                if error is not None:
+                    feedbacks.append({'action': action, 'feedback': error})
+                    trial += 1
+                    continue
+                action_success, feedback = self.check_action(state_desp, action, timestep+1, trial+1)
+                if action_success:
+                    break
+                feedbacks.append(feedback)
+                trial += 1
+                self.log('----- Re-plan the action -----')
+                continue
 
             if 'ERROR' in action:  # 若直接预测出错
                 trial += 2 if len(forbidden_actions) == 0 else 3  # 若有禁用动作则快速耗尽重试次数
@@ -1417,6 +1648,9 @@ class DialogModelPrompter:
 
         # (兜底) 若尝试次数达到上限但动作 a 仍不合理，则直接返回
         if not action_success:
+            if selected_dialog:
+                # 固定部分队友的提案失败，不代表整个状态的动作已穷尽。
+                return None, 'action_failed'
             if len(forbidden_actions) == 0:
                 if 'ERROR' in action:
                     return None, 'failure'
@@ -1427,9 +1661,10 @@ class DialogModelPrompter:
         return action, 'success'
 
     def get_llm_action(self, obs, feedbacks: list = [], forbidden_actions: list = [], action_history: list = [],
-                    timestep=None, trial_id=None):
+                    timestep=None, trial_id=None, active_agents=None, fixed_actions=None):
         """
-        让 agent 互相讨论协商后决定最终 “联合动作”
+        让 agent 轮流讨论。指定参与者时返回待校验的完整提案，
+        由 predict_action 检查固定动作后再进行环境格式处理。
         """
         _, final_response, agent_responses = self.prompt_one_dialog_round(
             obs,
@@ -1437,14 +1672,21 @@ class DialogModelPrompter:
             action_history=action_history,
             forbidden_actions=forbidden_actions,
             replan_idx=trial_id,
-            timestep=timestep
+            timestep=timestep,
+            active_agents=active_agents,
+            fixed_actions=fixed_actions
         )
 
         # action = self._extract_action(final_response, info={
         #     'role': 'policy', 'timestep': timestep, 'id': trial_id, 'property': 'extract_action'
         # })
 
-        action = self.env.process_action(final_response)
+        if active_agents is not None or fixed_actions is not None:
+            # 仅提取最终方案，交给 predict_action 校验后再进行环境格式处理。
+            action = ('EXECUTE\n' + final_response.rsplit('EXECUTE', 1)[1].strip()
+                        if 'EXECUTE' in final_response else 'ERROR')
+        else:
+            action = self.env.process_action(final_response)
 
         return action, agent_responses
 

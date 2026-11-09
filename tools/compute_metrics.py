@@ -273,6 +273,7 @@ if __name__ == "__main__":
     BATCHES = [
         "data/sort_dialog/mlaq/20260917_1615",
         "data/sort_dialog/vdn-mlaq/20260917_1555",
+        "data/sort_dialog/vdn-mlaq/20261103_1133"
     ]
 
     # 每个批次下要统计的 run_id

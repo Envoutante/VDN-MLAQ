@@ -240,10 +240,11 @@ class Nodes:
 class LangTree:
     def __init__(self, load=False, if_temp_tree=False, tree_path='data/lang_tree.pth',
                 num_agents=1, q_alpha=None, q_gamma=0.995, agent_names=None,
-                q_loop=1000, q_tol=1e-10):
+                q_loop=1000, q_tol=1e-10, algo='mlaq'):
         self.nodes = []
         self.if_temp_tree = if_temp_tree
         self.tree_path = tree_path
+        self.algo = algo
 
         # VDN 相关参数
         self.agent_names = list(agent_names) if agent_names else [f'agent{i}' for i in range(num_agents)]
@@ -255,6 +256,9 @@ class LangTree:
         self.q_loop = q_loop      # 迭代轮数上限（归一化 + alpha=0.3 下实测需 200~350 轮）
         self.q_tol = q_tol        # 收敛判据：max|delta| 小于此值即提前退出
         self.q_tables = [dict() for _ in range(self.num_agents)]   # 每个 agent 一张 Q 表 {(s, a_i): value}
+        # 个体动作/虚拟动作的实际访问次数；初始化记录不计作访问。
+        if self.algo == 'vdn-mlaq':
+            self.visit_num_tables = [dict() for _ in range(self.num_agents)]
         self.q_time = {'total': 0.0, 'calls': 0}   # 统计 Q 或 V 值的计算耗时
         self._joint_cache = {}   # 联合动作文本 -> {agent: 个体动作} 或 None，避免重复解析
 
@@ -274,17 +278,32 @@ class LangTree:
                     self.nodes.append(child['child'])
                     print(f'Node {child["child"].state} added to the tree')
 
-        self.save()
+        if getattr(self, 'algo', 'mlaq') != 'vdn-mlaq' or not self.if_temp_tree:
+            self.save()
 
     def save(self):
         torch.save(self, self.tree_path)
 
     def load(self, path='data/lang_tree.pth'):
+        if getattr(self, 'algo', 'mlaq') != 'vdn-mlaq':
+            # MLAQ 保留改进前的加载行为，不建立个体访问记录。
+            try:
+                temp_tree = torch.load(path, weights_only=False)
+                self.nodes = temp_tree.nodes
+            except:
+                print('No saved tree found')
+            return
         try:
             temp_tree = torch.load(path, weights_only=False)
-            self.nodes = temp_tree.nodes
-        except:
+        except FileNotFoundError:
             print('No saved tree found')
+            return
+        self.nodes = temp_tree.nodes
+        # 复用转移图，不把旧目标下的 Q 或全局节点次数当成本次个体访问次数。
+        self.q_tables = [dict() for _ in range(self.num_agents)]
+        self.visit_num_tables = [dict() for _ in range(self.num_agents)]
+        self._joint_cache = {}
+        self.sync_individual_actions()
 
     def build_node(self, state):
         """
@@ -346,6 +365,8 @@ class LangTree:
 
     def remove_node(self, state, action, virtual=False):
         state_node = self.get_node(state)
+        if getattr(self, 'algo', 'mlaq') == 'vdn-mlaq' and state_node is None:
+            return
         next_state_node = state_node.get_child(action)
         state_node.remove_child(action, virtual=virtual)  # 删除 state 节点的 action 边及其对应的子节点 (删除关系)
 
@@ -361,6 +382,8 @@ class LangTree:
             if remove_flag:  # 若没有其他节点引用 next_state_node，则删除 next_state_node (删除节点)
                 self.nodes.pop(self.nodes.index(next_state_node))
 
+        if getattr(self, 'algo', 'mlaq') == 'vdn-mlaq':
+            self.sync_individual_actions()
         if not self.if_temp_tree:
             self.save()
 
@@ -516,6 +539,139 @@ class LangTree:
                 actions.append(action)
         return actions
 
+    def _require_vdn(self):
+        if getattr(self, 'algo', 'mlaq') != 'vdn-mlaq':
+            raise ValueError('Individual exploration requires algo="vdn-mlaq"')
+
+    def init_individual_actions(self, state, with_virtual=False):
+        """从当前全局图登记个体动作；虚拟记录仅供想象阶段使用。
+
+        只补充缺失项，不覆盖已有 Q 或访问次数。调用本函数本身不计作访问。
+        终止状态可通过 with_virtual=False 避免新增虚拟入口。
+        """
+        self._require_vdn()
+        if with_virtual and not self.if_temp_tree:
+            raise ValueError('Virtual individual actions require a temporary tree')
+
+        state = preprocess_state(state)
+        for i, agent in enumerate(self.agent_names):
+            for action in self.get_individual_actions(state, agent):
+                key = (state, action)
+                self.q_tables[i].setdefault(key, 0.0)
+                self.visit_num_tables[i].setdefault(key, 0)
+            if with_virtual:
+                key = (state, 'action_virtual')
+                self.q_tables[i].setdefault(key, -0.1)
+                self.visit_num_tables[i].setdefault(key, 0)
+
+    def sync_individual_actions(self):
+        """按当前图补齐/清理个体条目，保留仍可用动作的 Q 和真实访问次数。
+
+        仅临时图中带全局虚拟边的状态保留个体虚拟项；不从节点次数推算
+        个体次数。复制转移、删除动作及重算 Q 均不构成一次访问。
+        """
+        self._require_vdn()
+        available = [set() for _ in self.agent_names]
+        for node in self.nodes:
+            with_virtual = self.if_temp_tree and any(
+                child['action'] == 'action_virtual' for child in node.children)
+            self.init_individual_actions(node.state, with_virtual=with_virtual)
+            for i, agent in enumerate(self.agent_names):
+                available[i].update((node.state, action)
+                                    for action in self.get_individual_actions(node.state, agent))
+                if with_virtual:
+                    available[i].add((node.state, 'action_virtual'))
+        for i, keys in enumerate(available):
+            self.q_tables[i] = {key: value for key, value in self.q_tables[i].items() if key in keys}
+            self.visit_num_tables[i] = {key: value for key, value in self.visit_num_tables[i].items() if key in keys}
+
+    def add_joint_visit_num(self, state, action):
+        """一条具体联合转移被实际评价/遍历一次，各个体动作分别记一次。"""
+        self._require_vdn()
+        action = preprocess_action(action)
+        parts = self._parse_joint(action)
+        if parts is None:
+            raise ValueError('Joint visit requires a concrete joint action')
+        node = self.get_node(state)
+        if node is None or node.get_child(action) is None:
+            raise ValueError('Joint visit requires an existing transition')
+        self.init_individual_actions(state)
+        for agent, individual_action in parts.items():
+            self.add_individual_visit_num(state, agent, individual_action)
+
+    def get_individual_visit_num(self, state, agent, individual_action):
+        """读取个体动作的访问次数；未登记的动作返回 0。"""
+        self._require_vdn()
+        i = self.agent_names.index(agent)
+        key = (preprocess_state(state), individual_action.strip())
+        return self.visit_num_tables[i].get(key, 0)
+
+    def add_individual_visit_num(self, state, agent, individual_action):
+        """为已登记动作增加一次访问；由搜索流程显式调用。"""
+        self._require_vdn()
+        i = self.agent_names.index(agent)
+        key = (preprocess_state(state), individual_action.strip())
+        if key not in self.visit_num_tables[i]:
+            raise KeyError(f'Individual action is not registered: {agent}, {key}')
+        self.visit_num_tables[i][key] += 1
+        return self.visit_num_tables[i][key]
+
+    def get_individual_ucb(self, state, agent, individual_action):
+        """计算已登记个体动作的 UCB，不更新 Q 或实际访问次数。
+
+        沿用全局 VDN UCB 的 Q/n + 2*sqrt(log(N)/n) 形式。
+        n 在计算时至少取 1；N 为该状态下已知个体动作和虚拟动作的
+        有效访问次数之和。同一个体动作跨联合搭配只计一次。
+        """
+        self._require_vdn()
+        i = self.agent_names.index(agent)
+        state = preprocess_state(state)
+        individual_action = individual_action.strip()
+        actions = self.get_individual_actions(state, agent)
+        if (state, 'action_virtual') in self.q_tables[i]:
+            actions.append('action_virtual')
+        if individual_action not in actions:
+            raise KeyError(f'Individual action is not available: {agent}, {individual_action}')
+
+        total_visit_num = 0
+        for action in actions:
+            key = (state, action)
+            if key not in self.q_tables[i] or key not in self.visit_num_tables[i]:
+                raise KeyError(f'Individual action is not registered: {agent}, {key}')
+            total_visit_num += max(1, self.visit_num_tables[i][key])
+        key = (state, individual_action)
+        visit_num = max(1, self.visit_num_tables[i][key])
+        return self.q_tables[i][key] / visit_num + 2 * np.sqrt(
+            np.log(total_visit_num) / visit_num)
+
+    def select_imagination_agents(self, state):
+        """返回最大 Q_tot 的已知基准联合动作及需要参与想象的 agent。
+
+        仅供全局虚拟入口选中后调用；调用方须先初始化个体动作及虚拟项。
+        虚拟 UCB 严格大于基准个体动作 UCB 才参与，平局保留基准动作。
+        无已知联合动作时全员参与；所有人保留基准动作时返回空列表。
+        本函数不调用 LLM、不增加访问次数，也不重新学习 Q。
+        """
+        self._require_vdn()
+        if not self.if_temp_tree:
+            raise ValueError('Imagination agent selection requires a temporary tree')
+        if self.get_node(state) is None:
+            raise ValueError(f'Unknown state: {state}')
+        virtual_ucb = {
+            agent: self.get_individual_ucb(state, agent, 'action_virtual')
+            for agent in self.agent_names
+        }
+        anchor_action, _ = self.vdn_get_best(state, without_virtual=True)
+        if anchor_action is None:
+            return None, list(self.agent_names)
+
+        anchor_parts = self._parse_joint(anchor_action)
+        active_agents = [
+            agent for agent in self.agent_names
+            if virtual_ucb[agent] > self.get_individual_ucb(state, agent, anchor_parts[agent])
+        ]
+        return anchor_action, active_agents
+
     def get_q_i(self, state, agent, individual_action):
         """
         获取 Q_i(s, a_i) 值
@@ -559,6 +715,8 @@ class LangTree:
         loop = self.q_loop if loop is None else loop
         tol = self.q_tol if tol is None else tol
         _t0 = time.perf_counter()  # —— 计时：算 Q 值总耗时/次数（对比用）——
+        if getattr(self, 'algo', 'mlaq') == 'vdn-mlaq':
+            self.sync_individual_actions()
         target_state = preprocess_state(target_state)
 
         # 预计算每个条目 (i, s, a_i) 被几条边共用 —— 写回时的归一化因子。
