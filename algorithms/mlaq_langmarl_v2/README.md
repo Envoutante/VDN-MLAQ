@@ -1,6 +1,6 @@
 # MLAQ + LangMARL 个体反馈 v2
 
-从 `mlaq_langmarl_v1` 派生，支持 Sort 的三智能体对话。v1 允许评估器只给部分智能体建议，v2 要求每次有效评估分别给 Alice、Bob、Chad 一条个体反馈。联合动作继续由原 MLAQ 搜索图、全局 UCB、候选检查和价值迭代处理。模型权重固定。
+从 `mlaq_langmarl_v1` 派生，支持 Sort 三智能体对话及 Overcooked-AI 双厨师对话。v1 允许评估器只给部分智能体建议，v2 要求每次有效评估给每位智能体一条反馈。模型权重固定。
 
 1. 环境交互记录每个联合动作前后的实际状态、奖励和执行状态。
 2. 评估 LLM 阅读当前回合的实际执行日志。对做得好的智能体，说清楚应保持哪项动作及其理由。涉及同一步协作时，分别写清参与者该做什么。同一份回复必须恰好包含每位智能体一条有效反馈，缺人、重复或字段无效时整轮反馈作废。
@@ -27,4 +27,20 @@
 评估 LLM 复用动作生成的流式调用，使用模型默认的生成预算。完整提示词和原始回复正文保存在最后一轮想象对应的 `simulate/round_<轮次>/critic_query/trial_<序号>/main_prompt.txt` 和 `main_response.txt`。同一轮的评估调用按 `trial_1`、`trial_2` 依次保存，无效回复也按原样保存。`trajectory_feedback.jsonl` 记录目录、API 结束原因、正文字符数和 API 提供的推理 token 数。
 
 [参考的 LangMARL 集中评估器](https://github.com/DaRL-GenAI/LangMARL/blob/28b8655b6e89c8c27eb5d3cdc212c3297465a696/langmarl/core/critic.py#L104)
+
+## Overcooked-AI
+
+使用与 [MLAQ 厨房版本](../mlaq/environments/overcooked_ai/README.md) 相同的地图、初始状态、动作控制器和搜索预算。
+
+```bash
+python -u algorithms/mlaq_langmarl_v2/run_MLAQ.py --task overcooked_dialog --llm_source deepseek-v4-flash --num_cases 1
+```
+
+评估器在每次实际执行后读取厨房日志，分别给 RightChef 和 LeftChef 一条建议。建议用执行前的状态定位，
+并在搜索再次扩展该状态时进入各自提示词。日志记录建议版本、生成的联合候选和实际执行的版本。
+结果位于 `data/overcooked_dialog/forced_coordination/mlaq_langmarl_v2/<批次>/`。
+每个执行回合的厨房视频与日志同目录，见 `interact/round_<编号>/replay_video.mp4`。
+
+固定回复验证覆盖了两个回合。第一轮送达耗时 44 个网格步。第二轮，两条反馈都进入对应厨师的提示词，
+搜索生成并执行了新的第一步，送达耗时 43 个网格步。该记录用于验证反馈闭环。
 

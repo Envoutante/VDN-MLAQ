@@ -8,7 +8,7 @@ from uuid import uuid4
 from prompting.lang_tree import preprocess_action, preprocess_state
 
 
-REVIEW_INSTRUCTION = """Read the execution log. Could the robots reach the same goal in fewer steps?
+SORT_REVIEW_CONTEXT = """Read the execution log. Could the robots reach the same goal in fewer steps?
 Even if they succeeded, check whether a robot that waited could safely move a cube
 in parallel or prepare a handoff one step earlier. Suggest the exact move and any
 teammate move it depends on. Use completed moves as evidence and treat alternatives as untested.
@@ -17,13 +17,15 @@ Alice can pick and place on panels 1–3, Bob on 3–5, Chad on 5–7.
 Each robot can move one cube or wait per step. Joint moves must pick different cubes
 and use different destinations. A destination can be freed by a pick in the same step.
 
-Give one individual recommendation for each robot. If a robot acted well, say
+"""
+
+REVIEW_FORMAT = """Give one individual recommendation for each robot. If a robot acted well, say
 what specific action it should keep doing and why. For a coordinated change, use
 the same step for the affected robots and give each its own part of the plan.
 Check that the recommendations work together, including any later handoff.
 
 Return only JSON. Each robot must appear exactly once, using this format:
-{"updates":[{"step":1,"agent":"Alice","decision":"add","evidence_step":1,"reason":"why this could help","condition":"when it applies","advice":"what to do"}]}
+{"updates":[{"step":1,"agent":"{example_agent}","decision":"add","evidence_step":1,"reason":"why this could help","condition":"when it applies","advice":"what to do"}]}
 Use completed step numbers from the log. The suggestion applies before "step",
 and "evidence_step" supports it. Use "add" when the robot has no existing advice
 at that state. Include the full set of robots even if the route needs no change.
@@ -42,8 +44,9 @@ def empty_usage():
 
 
 class TrajectoryFeedback:
-    def __init__(self, agents):
+    def __init__(self, agents, review_context=SORT_REVIEW_CONTEXT):
         self.agents = tuple(agents)
+        self.review_instruction = review_context + REVIEW_FORMAT.replace("{example_agent}", self.agents[0])
         self.reset()
 
     def reset(self, case_dir=None):
@@ -121,7 +124,7 @@ class TrajectoryFeedback:
         previous = [entry for (entry_goal, state, _), entry in self.active.items()
                     if entry_goal == goal and state in visited]
         prompt = (
-            REVIEW_INSTRUCTION + '\nRequired robots: ' + ', '.join(self.agents)
+            self.review_instruction + '\nRequired robots: ' + ', '.join(self.agents)
             + '\n\nExecution log:\n' + round_log.strip() + '\n'
         )
         if previous:

@@ -29,11 +29,6 @@ openai.proxy = {"http": "", "https": ""}
 os.environ["no_proxy"] = "*"
 os.environ["NO_PROXY"] = "*"
 
-# from runner.roco_runner import LLMRunner, TASK_NAME_MAP
-from runner.roco_runner import LLMRunner, TASK_NAME_MAP
-from runner.text_runner import LLMRunner as TextLLMRunner
-
-
 def _import_blocksworld():
     from environments.blocksworld.task_blocksworld import BlocksWorldTask
     return BlocksWorldTask
@@ -75,15 +70,16 @@ _LLM_ENV_FIELDS = {
 }
 
 
-def _setup_llm_api(llm_source):
+def _setup_llm_api(llm_source, env_file=None):
     """按模型名从 .env 读取对应的 API key/base，并写入 openai 全局配置。"""
     if llm_source not in _LLM_ENV_FIELDS:
         raise RuntimeError(
             f"未知模型 {llm_source}：请在 run_MLAQ.py 的 _LLM_ENV_FIELDS 中登记其 key/base 字段"
         )
     key_field, base_field, default_base = _LLM_ENV_FIELDS[llm_source]
-    api_key = _env.get(key_field, "")
-    api_base = _env.get(base_field, default_base)
+    config = _load_env_file(env_file) if env_file is not None else _env
+    api_key = config.get(key_field, "")
+    api_base = config.get(base_field, default_base)
     if not api_key:
         raise RuntimeError(
             f"未在 .env 中找到 {key_field}（模型 {llm_source} 对应）。请在项目根目录 .env 中写入："
@@ -97,18 +93,35 @@ def _setup_llm_api(llm_source):
 
 
 def main(args):
-    if args.task != 'sort_dialog' or args.comm_mode != 'dialog':
-        raise ValueError(f'{ALGORITHM} only supports sort_dialog with dialog communication')
+    if args.task not in ('sort_dialog', 'overcooked_dialog') or args.comm_mode != 'dialog':
+        raise ValueError(f'{ALGORITHM} supports sort_dialog and overcooked_dialog with dialog communication')
+    if args.tsteps is None:
+        args.tsteps = 40 if args.task == "overcooked_dialog" else 20
     if args.epoch:
         args.epoch = validate_epoch(args.epoch)
     args.data_dir = str((PROJECT_ROOT / args.data_dir).resolve())
-    _setup_llm_api(args.llm_source)   # 按 --llm_source 载入对应模型的 key/base
+    _setup_llm_api(args.llm_source, args.env_file)
+    if args.task == "overcooked_dialog":
+        from runner.overcooked_runner import AGENTS, RULES, run_overcooked
+        from prompting.trajectory_feedback import TrajectoryFeedback
+
+        review_context = (
+            f"{RULES}\n\nReview the actual cooking rollout. Identify changes that can "
+            "reduce grid steps or avoid an unsuccessful handoff. Check if a cook "
+            "can prepare an item while the other moves or the pot cooks. "
+            "Ground feedback in the logged steps and describe alternatives as untested.\n\n"
+        )
+        feedback = TrajectoryFeedback(AGENTS, review_context=review_context)
+        epoch = args.epoch or f"{ALGORITHM}/{datetime.now():%Y%m%d_%H%M%S}"
+        return run_overcooked(args, args.data_dir, epoch, feedback=feedback)
     # 本次实验的输出标识: <算法>/<YYYYMMDD_HHMM>，落到 data/<task>/<epoch_id> 下
     # 每次启动自动追加分钟时间戳，避免不同算法/批次互相覆盖。
     # 若显式传 --epoch（如 run_benchmark 多阶段续跑要固定同一批次），则原样使用
     epoch_id = args.epoch if args.epoch else "{}/{}".format(ALGORITHM, datetime.now().strftime("%Y%m%d_%H%M"))
 
     if args.task in ['sort_dialog', 'sandwich_dialog', 'sort_central', 'sandwich_central']:
+        from runner.roco_runner import LLMRunner, TASK_NAME_MAP
+
         assert args.task in TASK_NAME_MAP.keys(), f"Task {args.task} not supported"
         env_cl = TASK_NAME_MAP[args.task]
 
@@ -178,6 +191,8 @@ def main(args):
         # 运行 runner
         runner.run(args)
     elif args.task in ['blocksworld']:
+        from runner.text_runner import LLMRunner as TextLLMRunner
+
         BlocksWorldTask = _import_blocksworld()
         env = BlocksWorldTask(initial_coef=0.7, target_coef=0.3)
         env.set_optimal_steps(args.optimal_steps)
@@ -216,7 +231,11 @@ if __name__ == "__main__":
     # special parameters in LAQ
     parser.add_argument("--data_dir", "-d", type=str, default=str(DATA_ROOT))
     parser.add_argument("--epoch", type=str, default="", help=f"Batch ID: {ALGORITHM}/YYYYMMDD_HHMM")
-    parser.add_argument("--task", choices=['sort_dialog'], default='sort_dialog')
+    parser.add_argument("--task", choices=['sort_dialog', 'overcooked_dialog'], default='sort_dialog')
+    parser.add_argument("--env_file", help="Absolute path to the API configuration .env")
+    parser.add_argument("--grid_horizon", type=int, default=400, help="Overcooked grid steps per rollout")
+    parser.add_argument("--episodes", type=int, default=2, help="Overcooked rollouts per case")
+    parser.add_argument("--imagination_rounds", type=int, default=2, help="Overcooked search rounds per rollout")
     parser.add_argument("--start_run_id", "-sri", type=int, default=0)
     parser.add_argument("--start_case_id", "-sci", type=int, default=0)
     parser.add_argument("--num_cases", type=int, default=30, help="本次最多跑几个 case（从 start_case_id 起），测试用可设小值")
@@ -228,7 +247,7 @@ if __name__ == "__main__":
     # [6, 8, 10] for Sandwich
     parser.add_argument("--optimal_steps", "-ostep", type=int, default=2)
     parser.add_argument("--temperature", "-temp", type=float, default=0)
-    parser.add_argument("--tsteps", "-t", type=int, default=20)     # 20 for Blocksworld, 16 for Sandwich, 8 for Sort
+    parser.add_argument("--tsteps", "-t", type=int, help="Maximum decisions per rollout (40 in Overcooked, 20 otherwise)")
 
     # parameters in RoCo codes, some is not used in LAQ. We keep them for compatibility.
     parser.add_argument("--run_name", "-rn", type=str, default="test")
