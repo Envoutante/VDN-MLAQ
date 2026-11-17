@@ -270,11 +270,25 @@ def print_metrics_table(run_dirs: list, header: list = None):
 
 if __name__ == "__main__":
     # 批次路径 data/<task>/<algo>/<YYYYMMDD_HHMM>
+    # BATCHES = [
+    #     "data/sort_dialog/mlaq/20260917_1615",
+    #     "data/sort_dialog/vdn-mlaq/20260917_1555",
+    #     "data/sort_dialog/vdn-mlaq/20261103_1133",
+    #     "data/sort_dialog/vdn_mlaq_v3/20261109_1741"
+    # ]
+
     BATCHES = [
-        "data/sort_dialog/mlaq/20260917_1615",
         "data/sort_dialog/vdn-mlaq/20260917_1555",
-        "data/sort_dialog/vdn-mlaq/20261103_1133"
+        # "data/sort_dialog/vdn_mlaq_v1_1/20261110_1551",
+        "data/sort_dialog/vdn_mlaq_v3/20261109_1741",
+        "data/sort_dialog/vdn_mlaq_v4/20261109_2048"
     ]
+
+    # BATCHES = [
+    #     "data/sort_dialog/vdn-mlaq/20260917_1555",
+    #     "data/sort_dialog/mlaq_langmarl_v1/20261112_1851",
+    #     "data/sort_dialog/mlaq_langmarl_v2/20261116_1921"
+    # ]
 
     # 每个批次下要统计的 run_id
     RUN_IDS = range(6)

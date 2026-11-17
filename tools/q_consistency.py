@@ -178,7 +178,7 @@ class QConsistencyRecorder:
             mchild = mc[a]['child']
             fresh = (state, a, child.state) in pair['edges']
             pa = vdn._parse_joint(a) or {}
-            qi = {ag: vdn.q_tables[i].get((state, pa[ag]), 0.0)
+            qi = {ag: (vdn.get_q_i(state, ag, pa[ag]) or 0.0)
                   for i, ag in enumerate(vdn.agent_names) if ag in pa}
             qm = self.gamma * mchild.value if mchild.value is not None else None
             qv = vdn.get_q_tot(state, a)

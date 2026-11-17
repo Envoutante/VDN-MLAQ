@@ -15,7 +15,7 @@
     python run_benchmark.py --epoch mlaq/20260729_1906   # 续跑/复用指定批次
 """
 
-from runtime_layout import ALGORITHM, PROJECT_ROOT, bootstrap, validate_epoch
+from runtime_layout import ALGORITHM, ALGORITHM_ROOT, PROJECT_ROOT, bootstrap, validate_epoch
 bootstrap()
 
 import subprocess
@@ -129,7 +129,7 @@ def main():
             raise ValueError(f'Unknown argument: {arg}')
         i += 1
 
-    project_root = os.path.dirname(os.path.abspath(__file__))
+    algorithm_root = str(ALGORITHM_ROOT)
     # 批次标识: 未显式指定时按当前时间新建一个，保证每次完整 benchmark 独立成批
     if epoch is None:
         epoch = "{}/{}".format(algo, datetime.now().strftime("%Y%m%d_%H%M"))
@@ -176,10 +176,10 @@ def main():
         print(f"{'='*60}")
         sys.stdout.flush()
 
-        result = subprocess.run(args, cwd=project_root)
+        result = subprocess.run(args, cwd=algorithm_root)
         if result.returncode != 0:
             print(f"ERROR: optimal_steps={opt} failed with code {result.returncode}")
-            print(f"  Resume command: cd {project_root} && python run_benchmark.py --epoch {epoch} "
+            print(f"  Resume command: cd {algorithm_root} && python run_benchmark.py --epoch {epoch} "
                     f"--llm {llm} --max_opt {max_opt}"
                     + (' --compare_q' if compare_q else ''))
             sys.exit(1)
