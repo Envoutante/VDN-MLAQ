@@ -9,7 +9,7 @@ PROJECT_ROOT = ALGORITHM_ROOT.parents[1]
 DATA_ROOT = PROJECT_ROOT / 'data'
 def bootstrap():
     # Local packages must precede other checkouts; shared tools follow them.
-    for p in (str(PROJECT_ROOT), str(ALGORITHM_ROOT)):
+    for p in (str(PROJECT_ROOT), str(ALGORITHM_ROOT / "environments"), str(ALGORITHM_ROOT)):
         if p in sys.path: sys.path.remove(p)
         sys.path.insert(0, p)
     os.chdir(str(ALGORITHM_ROOT))

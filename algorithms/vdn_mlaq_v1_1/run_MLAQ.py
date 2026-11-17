@@ -35,7 +35,7 @@ from runner.text_runner import LLMRunner as TextLLMRunner
 
 
 def _import_blocksworld():
-    from other_envs.task_blocksworld import BlocksWorldTask
+    from environments.blocksworld.task_blocksworld import BlocksWorldTask
     return BlocksWorldTask
 
 

@@ -26,7 +26,8 @@ python algorithms/vdn_mlaq_v4/run_benchmark.py --compare_q
 
 ## 目录约定
 
-- `algorithms/<版本>/`：独立的 prompting、runner、rocobench、other_envs、入口、依赖声明与说明。
+- `algorithms/<版本>/`：独立保存搜索、执行入口、依赖及环境。环境代码和资源统一放在各版本的 `environments/`。
+- `environments/rocobench/` 包含 Sort、Sandwich 及机械臂相关代码。`environments/blocksworld/` 包含 BlocksWorld 和 PDDL 案例。这两个路径均相对于所属算法目录。
 - `data/`：公共输出根目录，各算法/批次隔离；历史结果不移动。
 - `tools/`：公共统计与辅助工具。Q 对照只在副本上估值，不参与实际选动作；API 配额工具由各版代码调用，修改这类运行工具也需核对所有版本。
 - `docs/`、`figures/`、`没用的代码/`：公共说明、图片和历史参考，不作为算法导入来源。
