@@ -20,9 +20,10 @@ bootstrap()
 
 import subprocess
 import sys
-import os
 import shutil
-import re
+from collections import Counter
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 import json
 from datetime import datetime
 
@@ -37,68 +38,57 @@ MAX_OPTIMAL_STEPS = 6
 # -----------------------------
 
 
-def _find_resume_point(data_root: str):
-    """
-    扫描 data_root 下的 run_{id} 目录，找到最大的 run_id 中"最早的未完成 case"。
-    返回 (resume_run_id, resume_case_id, restored_tree)。
-    仅检查本次 benchmark 计划内的 case。
-    """
-    resume_run_id = 0
-    resume_case_id = 0
-    restored_tree = False
+def _benchmark_case_counts():
+    # Keep the same case order and sizes as the Sort dialog environment.
+    cases_path = ALGORITHM_ROOT / "environments" / "rocobench" / "dialog_envs" / "task_sort_cases.json"
+    with cases_path.open(encoding="utf-8") as file:
+        available = Counter(case["optimal_steps"] for case in json.load(file))
+    return {run_id: min(CASES_PER_RUN, available[run_id + 1])
+            for run_id in range(MAX_OPTIMAL_STEPS)}
 
-    if not os.path.isdir(data_root):
-        return resume_run_id, resume_case_id, restored_tree
 
-    # 找出所有 run_{id} 目录
-    run_dirs = []
-    for entry in os.listdir(data_root):
-        m = re.match(r"run_(\d+)$", entry)
-        if m and os.path.isdir(os.path.join(data_root, entry)):
-            run_dirs.append(int(m.group(1)))
+def _case_finished(case_dir):
+    try:
+        with (case_dir / "case_result.json").open(encoding="utf-8") as file:
+            result = json.load(file)
+    except (OSError, ValueError):
+        return False
+    return isinstance(result, dict) and result.get("finished") is True
 
-    if not run_dirs:
-        return resume_run_id, resume_case_id, restored_tree
 
-    max_run = max(run_dirs)
-    run_dir = os.path.join(data_root, f"run_{max_run}")
+def _pending_case_ranges(run_dir, case_count):
+    """Yield half-open runs of unfinished or missing cases in the benchmark."""
+    start = None
+    for case_id in range(case_count):
+        if _case_finished(run_dir / f"case_{case_id}"):
+            if start is not None:
+                yield start, case_id
+                start = None
+        elif start is None:
+            start = case_id
+    if start is not None:
+        yield start, case_count
 
-    # 判定每个 case 是否"正常收尾"（case_result.json 内含 finished: true）
-    # 注：case_result.json 每个 round 都会写，只靠"文件存在"会把中途中断的 case
-    # 误判为已完成；故以 finished 标记为准。
-    finished, unfinished = set(), set()
-    for entry in os.listdir(run_dir):
-        m = re.match(r"case_(\d+)$", entry)
-        if not m or not os.path.isdir(os.path.join(run_dir, entry)):
-            continue
-        case_id = int(m.group(1))
-        if case_id >= CASES_PER_RUN:
-            continue
-        ok = False
-        result_path = os.path.join(run_dir, entry, "case_result.json")
-        if os.path.isfile(result_path):
-            try:
-                with open(result_path, encoding="utf-8") as f:
-                    ok = json.load(f).get("finished") is True
-            except (OSError, ValueError):
-                ok = False
-        (finished if ok else unfinished).add(case_id)
 
-    if not finished and not unfinished:
-        return max_run, resume_case_id, restored_tree
+def _restore_tree_before(data_root, run_id, start_case, case_counts):
+    shared_tree = data_root / "lang_tree.pth"
+    for prior_run in range(run_id, -1, -1):
+        end = start_case if prior_run == run_id else case_counts[prior_run]
+        for case_id in range(end - 1, -1, -1):
+            case = data_root / f"run_{prior_run}" / f"case_{case_id}"
+            snapshot = case / "lang_tree.pth"
+            if snapshot.is_file() and _case_finished(case):
+                with NamedTemporaryFile(dir=data_root, delete=False) as file:
+                    temporary = Path(file.name)
+                try:
+                    shutil.copyfile(snapshot, temporary)
+                    temporary.replace(shared_tree)
+                finally:
+                    temporary.unlink(missing_ok=True)
+                print(f"  Restored tree from {snapshot.relative_to(data_root)}")
+                return True
 
-    resume_run_id = max_run
-    # 从"最早的未完成 case"续跑（避免跳过被中断的 case）；全部完成则从最大已完成 +1
-    resume_case_id = min(unfinished) if unfinished else max(finished) + 1
-
-    # 恢复 lang_tree：取"续跑点前一个 case"的快照（即进入该 case 时的树状态）
-    shared_tree = os.path.join(data_root, "lang_tree.pth")
-    prev_tree = os.path.join(run_dir, f"case_{resume_case_id - 1}", "lang_tree.pth")
-    if resume_case_id > 0 and os.path.isfile(prev_tree):
-        shutil.copy(prev_tree, shared_tree)
-        restored_tree = True
-
-    return resume_run_id, resume_case_id, restored_tree
+    return (run_id > 0 or start_case > 0) and shared_tree.is_file()
 
 
 def main():
@@ -132,6 +122,9 @@ def main():
             raise ValueError(f'Unknown argument: {arg}')
         i += 1
 
+    if not 1 <= max_opt <= MAX_OPTIMAL_STEPS:
+        raise ValueError(f"--max_opt must be between 1 and {MAX_OPTIMAL_STEPS}")
+
     algorithm_root = str(ALGORITHM_ROOT)
     # 批次标识: 未显式指定时按当前时间新建一个，保证每次完整 benchmark 独立成批
     if epoch is None:
@@ -139,12 +132,10 @@ def main():
     else:
         epoch = validate_epoch(epoch)
     # data_root = data/<task>/<algo>/<YYYYMMDD_HHMM>
-    data_root = os.path.join(str(PROJECT_ROOT), "data", TASK, *epoch.split("/"))
+    data_root = PROJECT_ROOT / "data" / TASK / epoch
     print(f"本批次输出目录: {data_root}")
-    os.makedirs(data_root, exist_ok=True)
-
-    # 断点续跑：找到上次中断的位置
-    resume_run_id, resume_case_id, restored_tree = _find_resume_point(data_root)
+    data_root.mkdir(parents=True, exist_ok=True)
+    case_counts = _benchmark_case_counts()
 
     base_args = [
         sys.executable, "run_MLAQ.py",
@@ -158,45 +149,41 @@ def main():
     if compare_q:
         base_args.append("--compare_q")
 
-    for opt in range(resume_run_id + 1, max_opt + 1):
-        run_id = opt - 1
-        start_case = resume_case_id if run_id == resume_run_id else 0
-        if start_case >= CASES_PER_RUN:
-            print(f"  run_{run_id} already completed its {CASES_PER_RUN} benchmark cases")
+    shared_tree = data_root / "lang_tree.pth"
+    for run_id in range(max_opt):
+        opt = run_id + 1
+        run_dir = data_root / f"run_{run_id}"
+        pending = list(_pending_case_ranges(run_dir, case_counts[run_id]))
+        if not pending:
+            print(f"  run_{run_id} already completed its {case_counts[run_id]} benchmark cases")
             continue
 
-        shared_tree = os.path.join(data_root, "lang_tree.pth")
-        run_dir = os.path.join(data_root, f"run_{run_id}")
+        for start_case, end_case in pending:
+            args = base_args + [
+                "--optimal_steps", str(opt),
+                "--start_run_id", str(run_id),
+                "--start_case_id", str(start_case),
+                "--num_cases", str(end_case - start_case),
+            ]
+            if _restore_tree_before(data_root, run_id, start_case, case_counts):
+                args.append("--tree_load")
 
-        need_tree_load = restored_tree or opt > 1
+            print(f"\n{'='*60}")
+            print(f"  Running optimal_steps={opt}  run_id={run_id}  cases={start_case}..{end_case - 1}")
+            print(f"{'='*60}")
+            sys.stdout.flush()
 
-        args = base_args + [
-            "--optimal_steps", str(opt),
-            "--start_run_id", str(run_id),
-            "--start_case_id", str(start_case),
-            "--num_cases", str(CASES_PER_RUN - start_case),
-        ]
-        if need_tree_load:
-            args.append("--tree_load")
-
-        print(f"\n{'='*60}")
-        print(f"  Running optimal_steps={opt}  run_id={run_id}  start_case={start_case}")
-        print(f"{'='*60}")
-        sys.stdout.flush()
-
-        result = subprocess.run(args, cwd=algorithm_root)
-        if result.returncode != 0:
-            print(f"ERROR: optimal_steps={opt} failed with code {result.returncode}")
-            print(f"  Resume command: cd {algorithm_root} && python run_benchmark.py --epoch {epoch} "
-                    f"--llm {llm} --max_opt {max_opt}"
-                    + (' --compare_q' if compare_q else ''))
-            sys.exit(1)
+            result = subprocess.run(args, cwd=algorithm_root)
+            if result.returncode != 0:
+                print(f"ERROR: optimal_steps={opt} failed with code {result.returncode}")
+                print(f"  Resume command: python algorithms/{ALGORITHM}/run_benchmark.py --epoch {epoch} "
+                      f"--llm {llm} --max_opt {max_opt}"
+                      + (" --compare_q" if compare_q else ""))
+                sys.exit(1)
 
         print(f"  optimal_steps = {opt} completed")
-
-        # 备份 lang_tree 到 run 目录
-        if os.path.exists(shared_tree):
-            shutil.copy(shared_tree, os.path.join(run_dir, "lang_tree.pth"))
+        if shared_tree.is_file():
+            shutil.copyfile(shared_tree, run_dir / "lang_tree.pth")
             print(f"  backup saved at run_{run_id}/lang_tree.pth")
 
 

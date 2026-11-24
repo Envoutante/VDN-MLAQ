@@ -225,7 +225,7 @@ if __name__ == "__main__":
     parser.add_argument("--env_file", help="Absolute path to the API configuration .env")
     parser.add_argument("--grid_horizon", type=int, default=400, help="Overcooked grid steps per rollout")
     parser.add_argument("--episodes", type=int, default=2, help="Overcooked rollouts per case")
-    parser.add_argument("--imagination_rounds", type=int, default=2, help="Overcooked search rounds per rollout")
+    parser.add_argument("--imagination_rounds", type=int, default=2, help="Maximum Overcooked search attempts per planning request")
     parser.add_argument("--start_run_id", "-sri", type=int, default=0)
     parser.add_argument("--start_case_id", "-sci", type=int, default=0)
     parser.add_argument("--num_cases", type=int, default=30, help="本次最多跑几个 case（从 start_case_id 起），测试用可设小值")
@@ -237,7 +237,8 @@ if __name__ == "__main__":
     # [6, 8, 10] for Sandwich
     parser.add_argument("--optimal_steps", "-ostep", type=int, default=2)
     parser.add_argument("--temperature", "-temp", type=float, default=0)
-    parser.add_argument("--tsteps", "-t", type=int, help="Maximum decisions per rollout (40 in Overcooked, 20 otherwise)")
+    parser.add_argument("--tsteps", "-t", type=int,
+                        help="Search batch size in Overcooked (40), or rollout decision limit in other tasks (20)")
 
     # parameters in RoCo codes, some is not used in LAQ. We keep them for compatibility.
     parser.add_argument("--run_name", "-rn", type=str, default="test")

@@ -76,6 +76,15 @@ class TrajectoryFeedback:
         usage['estimated'] += int(estimated)
         usage['failed'] += int(failed)
 
+    def active_versions_for_state(self, goal, state):
+        goal, state = preprocess_state(goal), preprocess_state(state)
+        versions = {}
+        for agent in self.agents:
+            entry = self.active.get((goal, state, agent))
+            if entry is not None:
+                versions[agent] = entry['version']
+        return versions
+
     def advice_for_prompt(self, goal, state, agent):
         entry = self.active.get((preprocess_state(goal), preprocess_state(state), agent))
         if entry is None:

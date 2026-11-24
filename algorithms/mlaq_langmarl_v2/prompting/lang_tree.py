@@ -340,11 +340,15 @@ class LangTree:
         next_state_node.value = -0.1  # 略低的探索价值
         state_node.add_child(action, next_state_node, virtual=True)
 
-    def update(self, transition):
+    def update(self, transition, *, edge_metadata=None):
         state, action, next_state = transition
         state_node = self.build_node(state)
         next_state_node = self.build_node(next_state)
         state_node.add_child(action, next_state_node)
+        if edge_metadata is not None:
+            action_key = preprocess_action(action)
+            edge = next(edge for edge in state_node.children if edge["action"] == action_key)
+            edge.update(edge_metadata)
         if not self.if_temp_tree:
             self.save()
 

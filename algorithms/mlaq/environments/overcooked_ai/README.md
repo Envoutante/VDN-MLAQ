@@ -1,9 +1,11 @@
-# 经典 Overcooked-AI 首单送达
+# Overcooked-AI 400 步 MLAQ 基线
 
 上游使用 HumanCompatibleAI/overcooked_ai 的 `neurips2019` 标签，固定到提交
 `6eaceb0a9a2501f1b9fccbf4c7016d6662ed1108`。经典 `Forced Coordination` 在这个标签里叫 `random0`。厨房状态、碰撞、拿放和烹饪规则都由上游代码执行。[上游版本](https://github.com/HumanCompatibleAI/overcooked_ai/tree/6eaceb0a9a2501f1b9fccbf4c7016d6662ed1108)
 
-`OvercookedFirstSoup` 使用地图自带的固定初始状态。每次 `step()` 接收两名厨师同一网格步的动作。首次获得送餐奖励时回合结束，同时保留上游的回合步数上限。返回的 `info["delivered"]` 区分送达与超时，`info["grid_steps"]` 记录真实网格步数。
+`OvercookedFirstSoup` 使用地图自带的固定初始状态。每次 `step()` 接收两名厨师同一网格步的动作。
+MLAQ 入口关闭首汤终止，让送汤后的厨房状态接着进入下一次决策。`info["delivered"]` 标记本步是否送达，
+`info["grid_steps"]` 记录当前绝对网格步。
 
 ## 复现
 
@@ -31,19 +33,22 @@ if ((git -C $upstream rev-parse HEAD) -ne '6eaceb0a9a2501f1b9fccbf4c7016d6662ed1
 下面的命令假定 `python` 指向这个环境，并在项目根目录执行。
 
 ```bash
-python -u algorithms/mlaq/run_MLAQ.py --task overcooked_dialog --llm_source deepseek-v4-flash --num_cases 1
+nohup python -u algorithms/mlaq/run_MLAQ.py \
+  --task overcooked_dialog --llm_source deepseek-v4-flash \
+  --num_cases 1 --episodes 2 --grid_horizon 400 \
+  > "mlaq_overcooked_$(date +%Y%m%d_%H%M%S).log" 2>&1 &
 ```
 
 默认读取项目根目录的 `.env`，实验结果写入项目根目录的 `data`。
-默认跑固定初始状态的 `case_0`。可用 `--episodes`、`--imagination_rounds`、`--tsteps`、
-`--grid_horizon` 分别设置执行回合数、每回合的想象次数、高层决策上限和每回合网格步数上限。
-默认值依次为 2、2、40、400。结果位于 `data/overcooked_dialog/forced_coordination/mlaq/<批次>/`。
-地图在目录中位于算法名之前，批次内独立保存搜索图和地图配置。
+默认跑固定初始状态的 `case_0`，执行 2 个 episode，每个 episode 的正常终点是第 400 个底层网格步。
+`--imagination_rounds` 默认最多尝试两轮，找到完整路线后就执行。`--tsteps` 默认每 40 次高层决策重算一次想象阶段的路线价值。
+结果位于 `data/overcooked_dialog/forced_coordination/mlaq/<批次>/`。旧的首汤批次应保留供历史分析，
+400 步基线使用新批次和独立搜索图。
 
-每次高层决策由 RightChef 和 LeftChef 各选一个 `USE x,y` 或 `WAIT`。控制器在经典地图上
-把两个动作并行展开为网格操作。搜索用 MLAQ 的虚拟动作和 UCB，在环境副本上推演候选；
-正式执行使用真实模拟器。搜索图以首单送达为目标，并沿用每个高层决策一次的折扣。
-每轮记录实际网格步数、高层决策数、送达结果和 API 返回的 token 用量。
+基线与 `mlaq_langmarl_v2` 的厨房版本使用相同的 UCB、候选动作校验、LLM 下一状态预测和累计奖励估值。
+正式执行时才推进模拟器。需要补规划时，从真实状态接着想象到同一个第 400 步。搜索预算内找不到完整路线时，
+记录 `plan_incomplete`。基线关闭回合后评估和建议驱动的探索，动作及预测校验仍会向 LLM 提供被拒绝的原因以重试。
+`case_result.json` 中的 `critic_feedback` 为 `false`，每个 episode 同样记录奖励、送汤次数和送达网格步。
 
 每个执行回合自动在 `interact/round_<编号>/replay_video.mp4` 保存厨房回放，和 `log.txt` 放在一起。
 视频以 6 帧/秒播放，包含初始状态和实际执行的每个网格步，显示厨师、手持物品、锅内进度以及回合结果。
@@ -54,4 +59,4 @@ python -u algorithms/mlaq/run_MLAQ.py --task overcooked_dialog --llm_source deep
 
 手写路线由左侧厨师传递三个洋葱和一个盘子，右侧厨师煮汤并送餐。三个洋葱分别在第 7、14、21 步入锅，第 27 步将盘子放上共享台面，第 40 步煮好，第 44 步送达，团队稀疏奖励为 20。重置后重复同一路线，结果一致。单独用一步上限验证了超时会结束回合，送达标志为假。
 
-用固定模型回复通过 `run_MLAQ.py` 完成了完整搜索和执行。该路线经过 26 次高层决策、43 个网格步，送达奖励为 20。
+手写路线验证的是适配器的首汤模式。上面的 MLAQ 实验入口使用全时长模式。

@@ -58,15 +58,37 @@ class KitchenController:
                     pending.append((pose, moves + [direction]))
         raise ValueError(f"Fixture {target} is out of reach")
 
+    def reachable_fixtures(self, player):
+        reachable = []
+        for x, y in self.fixtures:
+            try:
+                self.commands(player, f"USE {x},{y}")
+            except ValueError:
+                continue
+            reachable.append(f"{x},{y} {self.fixtures[x, y]}")
+        return ", ".join(reachable)
+
+    def plan(self, state, joint_action):
+        plans = []
+        for agent, player, command in zip(AGENTS, state.players, joint_action):
+            try:
+                plans.append(self.commands(player, command))
+            except ValueError as error:
+                raise ValueError(f"{agent} cannot execute {command}: {error}") from error
+        return plans
+
     def execute(self, kitchen, joint_action, replay_states=None):
-        state = kitchen.env.state
-        plans = [self.commands(player, command)
-                 for player, command in zip(state.players, joint_action)]
+        plans = self.plan(kitchen.env.state, joint_action)
+        return self.execute_plan(kitchen, plans, replay_states)
+
+    def execute_plan(self, kitchen, plans, replay_states=None):
         for tick in range(max(map(len, plans))):
             actions = tuple(plan[tick] if tick < len(plan) else Action.STAY for plan in plans)
             state, reward, done, info = kitchen.step(actions)
             if replay_states is not None:
                 replay_states.append(state.deepcopy())
-            if done:
+            # A delivery ends this joint command. In a full episode, the next
+            # command starts from the delivered state without resetting the kitchen.
+            if done or info["delivered"]:
                 break
         return Transition(state, info["grid_steps"], reward, done, info["delivered"])

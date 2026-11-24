@@ -95,6 +95,8 @@ def _setup_llm_api(llm_source, env_file=None):
 def main(args):
     if args.task not in ('sort_dialog', 'overcooked_dialog') or args.comm_mode != 'dialog':
         raise ValueError(f'{ALGORITHM} supports sort_dialog and overcooked_dialog with dialog communication')
+    if args.full_horizon and args.task != "overcooked_dialog":
+        raise ValueError("--full_horizon requires --task overcooked_dialog")
     if args.tsteps is None:
         args.tsteps = 40 if args.task == "overcooked_dialog" else 20
     if args.epoch:
@@ -102,11 +104,14 @@ def main(args):
     args.data_dir = str((PROJECT_ROOT / args.data_dir).resolve())
     _setup_llm_api(args.llm_source, args.env_file)
     if args.task == "overcooked_dialog":
-        from runner.overcooked_runner import AGENTS, RULES, run_overcooked
+        from runner.overcooked_runner import AGENTS, FULL_HORIZON_RULES, run_overcooked
         from prompting.trajectory_feedback import TrajectoryFeedback
 
         review_context = (
-            f"{RULES}\n\nReview the actual cooking rollout. Identify changes that can "
+            f"{FULL_HORIZON_RULES}\n\nReview the actual cooking rollout. "
+            f"Judge changes by the number of soups that can be delivered within {args.grid_horizon} grid steps. "
+            "Check for idle time during cooking and whether the cooks can prepare another soup in parallel. "
+            "Identify changes that can "
             "reduce grid steps or avoid an unsuccessful handoff. Check if a cook "
             "can prepare an item while the other moves or the pot cooks. "
             "Ground feedback in the logged steps and describe alternatives as untested.\n\n"
@@ -234,8 +239,11 @@ if __name__ == "__main__":
     parser.add_argument("--task", choices=['sort_dialog', 'overcooked_dialog'], default='sort_dialog')
     parser.add_argument("--env_file", help="Absolute path to the API configuration .env")
     parser.add_argument("--grid_horizon", type=int, default=400, help="Overcooked grid steps per rollout")
+    parser.add_argument("--full_horizon", action="store_true",
+                        help="Compatibility flag for the now-default Overcooked grid horizon")
     parser.add_argument("--episodes", type=int, default=2, help="Overcooked rollouts per case")
-    parser.add_argument("--imagination_rounds", type=int, default=2, help="Overcooked search rounds per rollout")
+    parser.add_argument("--imagination_rounds", type=int, default=2,
+                        help="Maximum Overcooked search attempts per planning request")
     parser.add_argument("--start_run_id", "-sri", type=int, default=0)
     parser.add_argument("--start_case_id", "-sci", type=int, default=0)
     parser.add_argument("--num_cases", type=int, default=30, help="本次最多跑几个 case（从 start_case_id 起），测试用可设小值")
@@ -247,7 +255,8 @@ if __name__ == "__main__":
     # [6, 8, 10] for Sandwich
     parser.add_argument("--optimal_steps", "-ostep", type=int, default=2)
     parser.add_argument("--temperature", "-temp", type=float, default=0)
-    parser.add_argument("--tsteps", "-t", type=int, help="Maximum decisions per rollout (40 in Overcooked, 20 otherwise)")
+    parser.add_argument("--tsteps", "-t", type=int,
+                        help="Search batch size in Overcooked (40), or rollout decision limit in Sort (20)")
 
     # parameters in RoCo codes, some is not used in LAQ. We keep them for compatibility.
     parser.add_argument("--run_name", "-rn", type=str, default="test")

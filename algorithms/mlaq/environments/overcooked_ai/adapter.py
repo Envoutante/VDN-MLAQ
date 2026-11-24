@@ -1,4 +1,4 @@
-"""Run the classic Forced Coordination kitchen until the first delivery."""
+"""Run the classic Forced Coordination kitchen."""
 
 from copy import copy
 
@@ -10,10 +10,11 @@ LAYOUT_NAME = "forced_coordination"
 
 
 class OvercookedFirstSoup:
-    def __init__(self, horizon=400):
+    def __init__(self, horizon=400, stop_on_delivery=True):
         # The neurips2019 release calls Forced Coordination "random0".
         self.mdp = OvercookedGridworld.from_layout_name("random0")
         self.env = OvercookedEnv(self.mdp, horizon=horizon)
+        self.stop_on_delivery = stop_on_delivery
         self.delivered = False
 
     def reset(self):
@@ -33,13 +34,13 @@ class OvercookedFirstSoup:
         return branch
 
     def step(self, joint_action):
-        if self.delivered or self.env.is_done():
+        if (self.stop_on_delivery and self.delivered) or self.env.is_done():
             raise RuntimeError("Reset the kitchen before starting another episode.")
 
         state, sparse_reward, done, info = self.env.step(joint_action)
         # The pinned simulator awards sparse reward only on delivery.
         self.delivered = sparse_reward > 0
-        return state, sparse_reward, self.delivered or done, {
+        return state, sparse_reward, done or (self.stop_on_delivery and self.delivered), {
             **info,
             "delivered": self.delivered,
             "grid_steps": self.env.t,

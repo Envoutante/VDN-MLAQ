@@ -20,7 +20,8 @@
     python -u algorithms/mlaq_langmarl_v2/run_benchmark.py --llm deepseek-v4-flash
 
 输出到项目根目录的 `data/sort_dialog/mlaq_langmarl_v2/<批次>/`。续跑时传 `--epoch mlaq_langmarl_v2/<批次>`。
-批量实验每个难度最多跑 30 个 case（编号 0–29）。续跑只补原计划内剩余的 case。
+批量实验按 Sort 环境的数据集计数，每个难度最多选前 30 个 case。续跑检查所有计划内的编号，
+跳过 `case_result.json` 已标记 `finished: true` 的 case，并补跑缺失或中断的 case。
 
 每个 case 的 trajectory_feedback.jsonl 记录实际轨迹、拒绝的动作、建议的版本历史、提示词使用以及关联的新联合边。case_result.json 中的 trajectory_feedback 记录使用次数、入图与执行次数，并分别统计规划和评估的请求及 token。API 未返回 usage 时，token 按文本估算。建议随候选生成时进入了提示词，是否按建议行动由评估器根据实际轨迹判断。
 
@@ -30,7 +31,7 @@
 
 ## Overcooked-AI
 
-使用与 [MLAQ 厨房版本](../mlaq/environments/overcooked_ai/README.md) 相同的地图、初始状态、动作控制器和搜索预算。
+使用与 [MLAQ 厨房版本](../mlaq/environments/overcooked_ai/README.md) 相同的地图、初始状态和底层动作控制方式。
 
 ```bash
 python -u algorithms/mlaq_langmarl_v2/run_MLAQ.py --task overcooked_dialog --llm_source deepseek-v4-flash --num_cases 1
@@ -38,9 +39,28 @@ python -u algorithms/mlaq_langmarl_v2/run_MLAQ.py --task overcooked_dialog --llm
 
 评估器在每次实际执行后读取厨房日志，分别给 RightChef 和 LeftChef 一条建议。建议用执行前的状态定位，
 并在搜索再次扩展该状态时进入各自提示词。日志记录建议版本、生成的联合候选和实际执行的版本。
+再次遇到有待尝试建议的状态时，搜索优先生成一次联合候选。原动作保留供正常估值。
+同一组建议生成合法候选后即完成尝试，失败时最多补试一次。
+首次在正式执行中遇到这类状态时，会从该状态补一次想象。`case_result.json` 的 `feedback_search`
+统计触发位置、候选生成结果和额外执行中搜索的模型调用次数。
 结果位于 `data/overcooked_dialog/forced_coordination/mlaq_langmarl_v2/<批次>/`。
-每个执行回合的厨房视频与日志同目录，见 `interact/round_<编号>/replay_video.mp4`。
+实际执行从 `interact/round_1` 编号，同一个 episode 中的补规划不会另开执行目录。
+厨房视频与执行日志放在同一目录。评估器读取真实执行日志，提示词与回复保存在该 episode 的
+`interact/round_<编号>/critic_query/trial_<序号>/`。评估后的有效建议保存在当前 case 的内存中，
+下一次想象遇到匹配的状态时，分别写进两名厨师各自的动作提示词。
 
-固定回复验证覆盖了两个回合。第一轮送达耗时 44 个网格步。第二轮，两条反馈都进入对应厨师的提示词，
-搜索生成并执行了新的第一步，送达耗时 43 个网格步。该记录用于验证反馈闭环。
+想象和实际执行都以 `--grid_horizon`（默认 400）个底层网格步为终点。每份汤的奖励记在对应转移上，
+下一次决策使用送达后的厨房状态和绝对网格步。搜索按剩余时间内的预测累计奖励比较路线。
+`--tsteps` 设置每个搜索批次的高层决策数，同一轮想象可连续进行多个批次。
+找到完整预测路线后立即执行。`--imagination_rounds` 设定每次规划的尝试上限，只有续路还未补齐才重试。
+执行中的预测偏差导致续路缺失时，从真实状态重新搜索到同一终点，并使用下一个想象轮号。
+搜索预算用尽且仍找不到完整路线时，以 `plan_incomplete` 记录当时的进度。
+
+新候选先通过可达性检查及 LLM 动作检查，再由 LLM 预测并检查下一状态，通过后写入搜索图。
+想象沿预测状态展开。模拟器在实际执行阶段推进环境，并用真实后继状态修正搜索图。
+动作检查失败时，把原因发给两名厨师，在原状态重提。下一状态检查失败时，在同一动作上重新预测。
+两个环节各最多尝试三次。提示词、回复和拒绝原因保存在对应 `timestep_<编号>` 的角色和 `trial_<编号>` 目录中。
+永久图保存通过检查的预测转移和实际执行后的修正。每个 episode 用永久图初始化临时搜索图，
+虚拟动作和 UCB 访问次数留在临时图中。
+`case_result.json` 额外记录每轮的送汤数量、送达步数，以及首次执行前是否已有完整预测路线。
 
